@@ -1,0 +1,17 @@
+{
+  "name": "vfitcoach-site",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "build": "node scripts/build.mjs",
+    "qa": "node scripts/qa.mjs",
+    "security": "node scripts/security-check.mjs"
+  },
+  "devDependencies": {
+    "@fontsource-variable/inter": "^5.3.0",
+    "@fontsource-variable/montserrat": "^5.3.0",
+    "lighthouse": "^13.5.0",
+    "puppeteer": "^25.12.0",
+    "sharp": "^0.35.4"
+  }
+}
