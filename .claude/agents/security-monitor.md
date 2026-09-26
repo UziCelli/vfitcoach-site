@@ -13,4 +13,4 @@ Você monitora a segurança do site estático da VFITCOACH (pasta `public/`, dep
    - o problema, onde está, por que importa (1 linha cada);
    - a correção exata proposta.
    Não aplique correções sozinho: o dono aprova antes. Exceção: se for só "rode npm run build", rode e confirme.
-4. Nunca adicione dependências, formulários ou scripts de terceiros. Se o site passar a ter um formulário, exija validação no servidor e proteção anti-spam (ex.: Cloudflare Turnstile) antes do deploy.
+4. O único script de terceiros autorizado é o Google Tag Manager (GTM-WN5LPTMX) e os domínios do Google listados na CSP em `scripts/build.mjs`. Nunca adicione outras dependências, formulários ou scripts de terceiros. Se o site passar a ter um formulário, exija validação no servidor e proteção anti-spam (ex.: Cloudflare Turnstile) antes do deploy.

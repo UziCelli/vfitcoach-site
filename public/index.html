@@ -542,10 +542,20 @@
 
 <script>
   (function(){
+    // Google Tag Manager, carregado só depois do load pra não pesar na abertura da página.
+    var dl = window.dataLayer = window.dataLayer || [];
+    dl.push({ 'gtm.start': Date.now(), event: 'gtm.js' });
+    window.addEventListener('load', function(){
+      var s = document.createElement('script');
+      s.async = true;
+      s.src = 'https://www.googletagmanager.com/gtm.js?id=GTM-WN5LPTMX';
+      document.head.appendChild(s);
+    });
+
     // Conversão: cada clique em WhatsApp/telefone vira evento no dataLayer (GTM / Google Ads).
     document.addEventListener('click', function(e){
       var a = e.target.closest && e.target.closest('a[data-cta]');
-      if(a){ (window.dataLayer = window.dataLayer || []).push({ event:'whatsapp_click', cta:a.getAttribute('data-cta') }); }
+      if(a){ dl.push({ event: a.href.indexOf('tel:') === 0 ? 'phone_click' : 'whatsapp_click', cta: a.getAttribute('data-cta') }); }
     });
 
     var els = document.querySelectorAll('.reveal');

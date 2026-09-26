@@ -73,13 +73,21 @@ const hashes = (file, tag) => [...file.matchAll(new RegExp(`<${tag}>([\\s\\S]*?)
 const page404 = await readFile(pub('404.html'), 'utf8');
 const js = [...new Set([...hashes(html, 'script'), ...hashes(page404, 'script')])];
 const css = [...new Set([...hashes(html, 'style'), ...hashes(page404, 'style')])];
+// Google Tag Manager + conversões do Google Ads (domínios da documentação de CSP do Google).
+const g = {
+  script: 'https://*.googletagmanager.com https://www.googleadservices.com https://www.google.com https://googleads.g.doubleclick.net',
+  img: 'https://*.googletagmanager.com https://*.google-analytics.com https://www.google.com https://www.google.com.br https://*.doubleclick.net https://www.googleadservices.com',
+  connect: 'https://*.googletagmanager.com https://*.google-analytics.com https://*.analytics.google.com https://www.google.com https://*.doubleclick.net https://www.googleadservices.com https://pagead2.googlesyndication.com',
+  frame: 'https://*.googletagmanager.com https://td.doubleclick.net https://www.google.com',
+};
 const csp = [
   "default-src 'self'",
-  `script-src 'self' ${js.join(' ')}`,
+  `script-src 'self' ${js.join(' ')} ${g.script}`,
   `style-src 'self' ${css.join(' ')}`,
-  "img-src 'self' data:",
+  `img-src 'self' data: ${g.img}`,
   "font-src 'self'",
-  "connect-src 'self'",
+  `connect-src 'self' ${g.connect}`,
+  `frame-src ${g.frame}`,
   "object-src 'none'",
   "base-uri 'self'",
   "form-action 'none'",

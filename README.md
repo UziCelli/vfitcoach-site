@@ -32,9 +32,12 @@ Primeira vez numa máquina nova: `npx wrangler login`.
 
 ## Google Ads — conversões
 
-Cada clique em WhatsApp/telefone já envia `{ event: 'whatsapp_click', cta: 'topo' | 'hero' | 'final' | 'telefone' }` para o `dataLayer`.
-Para ligar ao Google Ads, instale o Google Tag Manager (ID `GTM-XXXX` da conta) e crie um acionador "Evento personalizado = whatsapp_click" → tag de conversão do Ads.
-Instalar o GTM exige liberar na CSP (`scripts/build.mjs`): `script-src https://www.googletagmanager.com`, `img-src`/`connect-src https://www.google-analytics.com https://*.google.com https://*.doubleclick.net`. Rode `npm run build` e `npm run qa` depois.
+Google Tag Manager `GTM-WN5LPTMX` instalado (carrega após o `load` da página). Cada clique envia para o `dataLayer`:
+- WhatsApp: `{ event: 'whatsapp_click', cta: 'topo' | 'hero' | 'final' }`
+- Telefone: `{ event: 'phone_click', cta: 'telefone' }`
+
+No GTM: acionador "Evento personalizado = whatsapp_click" → tag de conversão do Google Ads (+ tag "Vinculador de conversões" em todas as páginas). Publique o contêiner.
+Domínios do Google liberados na CSP ficam em `scripts/build.mjs` (objeto `g`). Tag nova de outro fornecedor = liberar o domínio lá, `npm run build`, `npm run qa`, `npm run deploy`. Evite tags "HTML personalizado": a CSP bloqueia scripts inline não autorizados.
 
 Os links de WhatsApp abrem com a mensagem "Olá, Victor! Vim pelo site e quero agendar uma avaliação." — assim dá pra identificar no WhatsApp quem veio do site.
 
