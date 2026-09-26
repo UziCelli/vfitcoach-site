@@ -2,6 +2,10 @@
 {
   "name": "vfitcoach",
   "compatibility_date": "2026-09-25",
+  "routes": [
+    { "pattern": "vfitcoachapp.com", "custom_domain": true },
+    { "pattern": "www.vfitcoachapp.com", "custom_domain": true }
+  ],
   "assets": {
     "directory": "./public",
     "not_found_handling": "404-page"

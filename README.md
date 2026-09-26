@@ -24,7 +24,8 @@ scripts/       ← build.mjs, qa.mjs, security-check.mjs
 `npm run deploy` → roda a checagem de segurança local e publica `public/` (config em `wrangler.jsonc`; o `_headers` e o `404.html` são aplicados pelo Cloudflare).
 Primeira vez numa máquina nova: `npx wrangler login`.
 
-- Endereço provisório: https://vfitcoach.vfitcoach-site.workers.dev
+- No ar em https://vfitcoachapp.com e https://www.vfitcoachapp.com (custom domains do Worker `vfitcoach`; o endereço *.workers.dev fica desligado).
+- Cloudflare → SSL/TLS → Edge Certificates: **Always Use HTTPS** ligado, TLS mínimo 1.2.
 - Domínio: a zona `vfitcoachapp.com` fica no DNS do Cloudflare (nameservers), o registro do domínio continua no Squarespace. Registros de e-mail do Google Workspace (MX, SPF, DKIM) estão em `dns-backup.txt` — nunca apague esses.
 - No Cloudflare, deixe **desligados**: Rocket Loader, Email Obfuscation e Web Analytics automático — eles injetam scripts que a CSP bloqueia.
 - Depois do domínio no ar: `npm run security` passa a checar os headers ao vivo.
