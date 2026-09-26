@@ -1,0 +1,15 @@
+# DNS de vfitcoachapp.com antes da migração (capturado em 2026-09-25 via 8.8.8.8)
+# Registros de E-MAIL (Google Workspace) — precisam existir no Cloudflare:
+
+MX   @   smtp.google.com   prioridade 1
+TXT  @   v=spf1 include:_spf.google.com ~all
+TXT  google._domainkey   v=DKIM1; k=rsa; p=MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEA02b45VmHsMPd0+KIhJNI0oPBUfO2K0nJAudP0ykLxN06HdW57iitHYf0b1vP8dFre9VphQF1rqWH3Lj1f6clcWvuX6/rSdlmz9UpVSQTEK1wKJQdPerhUPaTbQ3+XeN1w2ItNQcbH2OeP7yQdpuAgehTT5PbVLZVgV2H6EVMQDcz0KT98m8TAtepqsJy834oqU06z0HSwSvZ2u4WMDVFso5WA+GFARLT1iyFEaHntQFwD14jhDTcBoQ7vFAAoSbucUYkDgJq/LzDGR6KnzrrUNQSSh3ZTpzblmmoFxfiVqVAtEP3GK+qJ/SRwM8s86aykviYJuKRSk6zsFmtTe6s+QIDAQAB
+
+# Registros do SITE antigo (Squarespace) — serão substituídos pelo Cloudflare Pages:
+A    @   198.49.23.144
+A    @   198.49.23.145
+A    @   198.185.159.144
+A    @   198.185.159.145
+CNAME www ext-sq.squarespace.com
+
+# Nameservers atuais: nsa1..nsa4.squarespacedns.com · DNSSEC: ATIVO (desligar antes de trocar nameservers)

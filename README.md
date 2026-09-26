@@ -19,17 +19,15 @@ scripts/       ← build.mjs, qa.mjs, security-check.mjs
 
 Última medição (Lighthouse mobile, local): Performance 100 · Acessibilidade 100 · Boas práticas 100 · SEO 100 · LCP 1,5 s.
 
-## Deploy (Cloudflare Pages)
+## Deploy (Cloudflare Workers — assets estáticos)
 
-1. Suba esta pasta para um repositório no GitHub (privado).
-2. Cloudflare → Workers & Pages → Create → Pages → conectar o repositório.
-   - Build command: **vazio** (os arquivos já estão gerados)
-   - Build output directory: **public**
-3. Custom domains → `vfitcoachapp.com` e `www.vfitcoachapp.com`. Hoje o domínio aponta para o **Squarespace**: troque os registros DNS conforme o Cloudflare indicar (ou transfira os nameservers para o Cloudflare).
-4. No Cloudflare, deixe **desligados**: Rocket Loader, Email Obfuscation e Web Analytics automático — eles injetam scripts que a CSP bloqueia.
-5. Depois do deploy: `npm run security` passa a checar os headers ao vivo.
+`npm run deploy` → roda a checagem de segurança local e publica `public/` (config em `wrangler.jsonc`; o `_headers` e o `404.html` são aplicados pelo Cloudflare).
+Primeira vez numa máquina nova: `npx wrangler login`.
 
-Netlify também lê o `_headers`; basta publicar a pasta `public`.
+- Endereço provisório: https://vfitcoach.vfitcoach-site.workers.dev
+- Domínio: a zona `vfitcoachapp.com` fica no DNS do Cloudflare (nameservers), o registro do domínio continua no Squarespace. Registros de e-mail do Google Workspace (MX, SPF, DKIM) estão em `dns-backup.txt` — nunca apague esses.
+- No Cloudflare, deixe **desligados**: Rocket Loader, Email Obfuscation e Web Analytics automático — eles injetam scripts que a CSP bloqueia.
+- Depois do domínio no ar: `npm run security` passa a checar os headers ao vivo.
 
 ## Google Ads — conversões
 

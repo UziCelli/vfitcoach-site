@@ -1,0 +1,9 @@
+// Deploy: npm run deploy  (site estático servido pelo Cloudflare Workers; _headers é aplicado automaticamente)
+{
+  "name": "vfitcoach",
+  "compatibility_date": "2026-09-25",
+  "assets": {
+    "directory": "./public",
+    "not_found_handling": "404-page"
+  }
+}
