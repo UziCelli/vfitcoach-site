@@ -137,6 +137,9 @@
   .hero-photo{ align-self:end; }
   .hero-photo img{ width:100%; max-width:340px; margin-inline:auto; border-radius:16px 16px 0 0; }
   @media (max-width:480px){ .hero-actions .btn{ flex:1 1 100%; } }
+  .alt-cta{ margin-top:14px; font-size:14px; color:#CBD8ED; }
+  .alt-cta a{ color:#fff; font-weight:600; text-underline-offset:3px; display:inline-block; padding-block:6px; }
+  .final-cta .alt-cta{ color:#E4EDF9; }
   .trust-strip{
     margin-top:36px;
     display:grid; grid-template-columns:repeat(3,1fr); gap:1px;
@@ -291,6 +294,7 @@
           <a class="btn btn-accent" data-cta="hero" href="https://wa.me/5511942739425?text=Ol%C3%A1%2C%20Victor!%20Vim%20pelo%20site%20e%20quero%20agendar%20uma%20avalia%C3%A7%C3%A3o." target="_blank" rel="noopener">Agendar avaliação no WhatsApp</a>
           <a class="btn btn-ghost" href="#resultados">Ver resultados reais</a>
         </div>
+        <p class="alt-cta">Prefere marcar direto? <a data-cta="agenda-hero" href="https://calendar.app.google/yYdC11bdCtNab2xd6" target="_blank" rel="noopener">Escolha um horário na agenda</a></p>
       </div>
       <div class="hero-photo">
         <picture>
@@ -525,6 +529,7 @@
       <h2 id="h-cta">O primeiro passo é uma conversa, não um contrato</h2>
       <p>Manda sua rotina e objetivo — a resposta já traz os próximos passos.</p>
       <a class="btn btn-accent" data-cta="final" href="https://wa.me/5511942739425?text=Ol%C3%A1%2C%20Victor!%20Vim%20pelo%20site%20e%20quero%20agendar%20uma%20avalia%C3%A7%C3%A3o." target="_blank" rel="noopener">Falar com Victor no WhatsApp</a>
+      <p class="alt-cta">Prefere marcar direto? <a data-cta="agenda-final" href="https://calendar.app.google/yYdC11bdCtNab2xd6" target="_blank" rel="noopener">Escolha um horário na agenda</a></p>
     </div>
   </section>
 </main>
@@ -542,20 +547,25 @@
 
 <script>
   (function(){
-    // Google Tag Manager, carregado só depois do load pra não pesar na abertura da página.
+    // Google Tag Manager, carregado 2s após o load pra não pesar na abertura da página.
+    // Cliques antes disso ficam na fila do dataLayer e são processados quando o GTM chega.
     var dl = window.dataLayer = window.dataLayer || [];
     dl.push({ 'gtm.start': Date.now(), event: 'gtm.js' });
     window.addEventListener('load', function(){
-      var s = document.createElement('script');
-      s.async = true;
-      s.src = 'https://www.googletagmanager.com/gtm.js?id=GTM-WN5LPTMX';
-      document.head.appendChild(s);
+      setTimeout(function(){
+        var s = document.createElement('script');
+        s.async = true;
+        s.src = 'https://www.googletagmanager.com/gtm.js?id=GTM-WN5LPTMX';
+        document.head.appendChild(s);
+      }, 2000);
     });
 
-    // Conversão: cada clique em WhatsApp/telefone vira evento no dataLayer (GTM / Google Ads).
+    // Conversão: cada clique em WhatsApp/telefone/agenda vira evento no dataLayer (GTM / Google Ads).
     document.addEventListener('click', function(e){
       var a = e.target.closest && e.target.closest('a[data-cta]');
-      if(a){ dl.push({ event: a.href.indexOf('tel:') === 0 ? 'phone_click' : 'whatsapp_click', cta: a.getAttribute('data-cta') }); }
+      if(!a) return;
+      var ev = a.href.indexOf('tel:') === 0 ? 'phone_click' : a.href.indexOf('wa.me') > -1 ? 'whatsapp_click' : 'schedule_click';
+      dl.push({ event: ev, cta: a.getAttribute('data-cta') });
     });
 
     var els = document.querySelectorAll('.reveal');

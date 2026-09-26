@@ -173,6 +173,10 @@ console.log('\n[WhatsApp]');
   await page.click('a[data-cta="hero"]');
   const dl = await page.evaluate(() => window.dataLayer || []);
   check(dl.some((e) => e.event === 'whatsapp_click' && e.cta === 'hero'), 'clique gera evento whatsapp_click no dataLayer');
+  const agenda = await page.$$eval('a[href^="https://calendar.app.google/"]', (as) => as.map((a) => a.target === '_blank' && a.rel.includes('noopener') && !!a.dataset.cta));
+  check(agenda.length === 2 && agenda.every(Boolean), `2 links de agenda (nova aba, noopener, data-cta) (${agenda.length})`);
+  await page.click('a[data-cta="agenda-hero"]');
+  check((await page.evaluate(() => window.dataLayer)).some((e) => e.event === 'schedule_click'), 'clique na agenda gera evento schedule_click');
   try {
     const r = await fetch('https://wa.me/5511942739425', { redirect: 'manual' });
     check(r.status < 400, `wa.me responde (HTTP ${r.status})`);
