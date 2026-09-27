@@ -100,6 +100,18 @@
   }
   .topbar .wrap{ display:flex; align-items:center; justify-content:space-between; padding-block:12px; gap:16px; }
   .logo-mark{ height:24px; width:auto; flex:0 0 auto; display:block; }
+  /* Logo completo -> ícone VFC entre 0 e 300px de scroll (CSS scroll-driven; sem suporte, fica o logo completo) */
+  .brand{ display:grid; align-items:center; --shrink:.6; }
+  .brand > svg{ grid-area:1/1; transform-origin:left center; }
+  .logo-icon{ width:36px; height:36px; opacity:0; }
+  @media (prefers-reduced-motion: reduce){ .brand{ --shrink:1; } }
+  @keyframes logo-out{ 60%,100%{ opacity:0; transform:scale(var(--shrink)); } }
+  @keyframes icon-in{ 0%,40%{ opacity:0; transform:scale(var(--shrink)); } 100%{ opacity:1; transform:none; } }
+  @supports (animation-timeline: scroll()){
+    .brand > svg{ animation:linear both; animation-timeline:scroll(root); animation-range:0 300px; }
+    .brand .logo-mark{ animation-name:logo-out; }
+    .brand .logo-icon{ animation-name:icon-in; }
+  }
   .btn{
     display:inline-flex; align-items:center; justify-content:center; gap:8px;
     padding:12px 22px; border-radius:6px; min-height:44px;
@@ -241,7 +253,7 @@
 
 <header class="topbar">
   <div class="wrap">
-    <a href="/" aria-label="VFITCOACH, início">
+    <a class="brand" href="/" aria-label="VFITCOACH, início">
       <svg class="logo-mark" viewBox="191 399 570 140" xmlns="http://www.w3.org/2000/svg" aria-hidden="true" focusable="false">
         <g transform="translate(0.000000,938.000000) scale(0.100000,-0.100000)" fill="#FFFFFF" stroke="none">
           <path d="M4545 5226 c-112 -27 -219 -105 -289 -210 -20 -30 -36 -56 -36 -58 0
@@ -278,6 +290,7 @@
 -70z"/>
         </g>
       </svg>
+      <svg class="logo-icon" viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg" aria-hidden="true" focusable="false"><path fill="#FFFFFF" fill-rule="evenodd" d="M0 100A100 100 0 1 0 200 100A100 100 0 1 0 0 100ZM40.61 128.69 18.68 71.31H34.37L48.31 108.69L62.54 71.31H76.92L54.92 128.69ZM83.72 128.69V71.31H124V83.85H98.25V96.47H120.92V109.01H98.25V128.69ZM159.15 129.79Q166.29 129.79 171.93 127.06Q177.56 124.31 181.32 119.3L172.04 110.23Q169.53 113.42 166.56 115.09Q163.57 116.75 159.88 116.75Q156.72 116.75 154.07 115.65Q151.42 114.54 149.54 112.43Q147.66 110.32 146.6 107.38Q145.53 104.44 145.53 100.86Q145.53 97.28 146.6 94.34Q147.66 91.4 149.54 89.29Q151.42 87.18 154.07 86.07Q156.72 84.95 159.88 84.95Q163.57 84.95 166.56 86.62Q169.53 88.3 172.04 91.47L181.32 82.41Q177.56 77.32 171.93 74.62Q166.29 71.92 159.15 71.92Q153.04 71.92 147.85 74.02Q142.65 76.13 138.86 80.03Q135.07 83.92 132.93 89.2Q130.8 94.49 130.8 100.86Q130.8 107.22 132.93 112.5Q135.07 117.79 138.86 121.68Q142.65 125.59 147.85 127.69Q153.04 129.79 159.15 129.79Z"/></svg>
     </a>
     <a class="btn btn-accent btn-sm" data-cta="topo" href="https://wa.me/5511942739425?text=Ol%C3%A1%2C%20Victor!%20Vim%20pelo%20site%20e%20quero%20agendar%20uma%20avalia%C3%A7%C3%A3o." target="_blank" rel="noopener">Falar no WhatsApp</a>
   </div>
