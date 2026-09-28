@@ -48,7 +48,7 @@
     --muted:#54607A;
     --border:#E1E6EE;
     --hl:rgba(74,123,175,.28);          /* marca-texto dos títulos */
-    --bar-antes:#3F6A9C; --bar-depois:#A8D0FF; /* barras dos resultados (validadas p/ daltonismo) */
+    --bar-trilho:rgba(255,255,255,.12); --bar-depois:#A8D0FF; /* barras dos resultados */
     color-scheme: light;
   }
   /* tema escuro automático (segue o celular/computador do visitante) */
@@ -210,8 +210,8 @@
   .legend{ display:none; }
   .js .legend{ display:inline-flex; gap:16px; margin:0 0 14px; padding:7px 14px; border-radius:999px; background:var(--navy); color:#C3D3EA; font-size:12.5px; }
   .legend span{ display:inline-flex; align-items:center; gap:7px; }
-  .legend span::before{ content:""; width:16px; height:12px; border-radius:0 4px 4px 0; background:var(--bar-antes); }
-  .legend span + span::before{ height:6px; border-radius:0 3px 3px 0; background:var(--bar-depois); }
+  .legend span::before{ content:""; width:3px; height:12px; border-radius:1px; background:#fff; }
+  .legend span + span::before{ width:16px; border-radius:0 4px 4px 0; background:var(--bar-depois); }
   .results-grid{ display:grid; grid-template-columns:repeat(2,1fr); gap:16px; }
   @media (max-width:720px){ .results-grid{ grid-template-columns:1fr; } }
   .client-card{
@@ -233,11 +233,11 @@
   .stat dd{ margin:0; font-size:14.5px; color:#C3D3EA; white-space:nowrap; font-variant-numeric:tabular-nums; }
   .stat .para{ display:inline-block; color:#fff; }
   .stat .arrow{ color:#8FB3DE; }
-  /* barra antes → depois (montada pelo script): grossa e apagada = antes; fina e clara = depois */
-  .bar{ position:absolute; left:0; right:0; bottom:12px; height:12px; }
-  .bar i, .bar b{ position:absolute; left:0; }
-  .bar i{ top:0; height:12px; width:var(--a); border-radius:0 4px 4px 0; background:var(--bar-antes); }
-  .bar b{ top:3px; height:6px; width:var(--a); border-radius:0 3px 3px 0; background:var(--bar-depois); }
+  /* barra antes → depois (montada pelo script): trilho fixo; barra clara = depois; marcador branco = onde estava antes */
+  .bar{ position:absolute; left:0; right:0; bottom:12px; height:12px; border-radius:0 4px 4px 0; background:var(--bar-trilho); }
+  .bar i, .bar b{ position:absolute; top:0; height:12px; }
+  .bar b{ left:0; width:var(--a); border-radius:0 4px 4px 0; background:var(--bar-depois); }
+  .bar i{ z-index:1; left:calc(var(--a) - 3px); width:3px; border-radius:1px; background:#fff; box-shadow:0 0 0 1.5px var(--navy); }
   .in .bar b{ width:var(--b); transition:width 1.4s cubic-bezier(.22,.8,.26,1) .35s; }
   @media (prefers-reduced-motion: reduce){ .bar b{ width:var(--b); } }
 
