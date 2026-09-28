@@ -23,12 +23,13 @@ for (const f of pages) {
   if (/<form\b/i.test(html)) bad(`${f}: tem <form> — precisa de proteção anti-spam/validação antes de publicar`);
   if (/<script[^>]+src=["']?https?:/i.test(html)) bad(`${f}: script externo (atualize a CSP e avalie o risco)`);
   if (/<[a-z]+\s[^>]*\son[a-z]+\s*=/i.test(html)) bad(`${f}: handler inline (onclick=...) — bloqueado pela CSP`);
+  if (/<[a-z][^>]*\sstyle\s*=/i.test(html)) bad(`${f}: atributo style="..." — bloqueado pela CSP (use uma classe no <style>)`);
   for (const a of html.match(/<a\b[^>]*target=["']?_blank[^>]*>/gi) || []) if (!/noopener|noreferrer/.test(a)) bad(`${f}: link _blank sem rel=noopener → ${a.slice(0, 80)}`);
   if (/href=["']http:\/\//i.test(html)) bad(`${f}: link http:// (sem HTTPS)`);
   // CSP desatualizada = script/estilo bloqueado em produção
   for (const tag of ['script', 'style']) for (const m of html.matchAll(new RegExp(`<${tag}>([\\s\\S]*?)</${tag}>`, 'g'))) {
     const h = `sha256-${createHash('sha256').update(m[1]).digest('base64')}`;
-    if (!headers.includes(h)) bad(`${f}: <${tag}> inline mudou e a CSP não — rode "npm run build"`);
+    if (!headers.includes(h)) bad(`${f}: <${tag}> inline mudou e a CSP não — rode "npm run headers"`);
   }
 }
 for (const h of ['Content-Security-Policy', 'Strict-Transport-Security', 'X-Content-Type-Options', 'Referrer-Policy', 'frame-ancestors']) if (!headers.includes(h)) bad(`_headers sem ${h}`);

@@ -26,6 +26,7 @@ const types = { '.html': 'text/html; charset=utf-8', '.svg': 'image/svg+xml', '.
 const server = http.createServer(async (req, res) => {
   let path = decodeURIComponent(new URL(req.url, 'http://x').pathname);
   if (path.endsWith('/')) path += 'index.html';
+  else if (!extname(path)) path += '.html'; // /privacidade → privacidade.html, como no Cloudflare
   const file = normalize(join(pub, path));
   let body, status = 200;
   try { if (!file.startsWith(pub)) throw 0; body = await readFile(file); }
@@ -46,14 +47,27 @@ console.log(`servidor local: ${base}`);
 
 const browser = await launch();
 
-// --- 1. dados dos clientes idênticos ao protótipo ---
+// --- 1. cards de clientes: só iniciais, dados completos e destaque batendo com os números ---
 console.log('\n[dados de clientes]');
-const cardsText = (html) => [...html.matchAll(/<article class="client-card[\s\S]*?<\/article>/g)]
-  .map((m) => m[0].replace(/<[^>]+>/g, ' ').replace(/\s+/g, ' ').trim());
-const proto = cardsText(await readFile(join(root, 'src/prototipo.html'), 'utf8'));
-const built = cardsText(await readFile(join(pub, 'index.html'), 'utf8'));
-check(proto.length === 4 && built.length === 4, `4 cards de cliente (protótipo ${proto.length}, site ${built.length})`);
-proto.forEach((t, i) => check(t === built[i], `card ${i + 1} idêntico: "${t}"`));
+const html = await readFile(join(pub, 'index.html'), 'utf8');
+const num = (t) => { const m = /(\d[\d.]*(?:,\d+)?)/.exec(t); return m ? (/^\s*[−-]/.test(t) ? -1 : 1) * +m[1].replace(/\./g, '').replace(',', '.') : NaN; };
+const cards = [...html.matchAll(/<article class="client-card[\s\S]*?<\/article>/g)].map((m) => m[0]);
+check(cards.length > 0, `${cards.length} cards de cliente`);
+for (const c of cards) {
+  const name = c.match(/class="name">([^<]*)</)?.[1]?.trim() || '?';
+  check(/^(\p{Lu}\.\s?){1,3}$/u.test(name), `card "${name}": só iniciais (LGPD)`);
+  const deltas = [...c.matchAll(/<span class="de">([^<]+)<\/span>[\s\S]*?<strong class="para">([^<]+)<\/strong>/g)].map((m) => num(m[2]) - num(m[1]));
+  const big = num(c.match(/<p class="destaque"><strong>([^<]+)<\/strong>/)?.[1] || '');
+  check(/class="meta">[^<]+</.test(c) && /class="modality">[^<]+</.test(c) && deltas.length > 0 && !deltas.some(Number.isNaN), `card "${name}": modalidade, tempo e ${deltas.length} números antes → depois`);
+  check(deltas.some((d) => Math.abs(d - big) < 0.05), `card "${name}": destaque (${big}) = depois − antes de um dos números`);
+}
+// textos que a animação mexe: no fim têm que voltar exatamente a isto
+const finalTexts = [...html.matchAll(/<p class="destaque"><strong>([^<]+)<\/strong>|<strong class="para">([^<]+)<\/strong>/g)].map((m) => m[1] || m[2]);
+const readTexts = (page) => page.$$eval('.destaque strong, .stat .para', (els) => els.map((e) => e.textContent));
+const barsOk = (page) => page.$$eval('.stat', (st) => st.every((s) => {
+  const bar = s.querySelector('.bar'), b = bar?.querySelector('b');
+  return b && Math.abs(b.getBoundingClientRect().width / bar.getBoundingClientRect().width - parseFloat(bar.style.getPropertyValue('--b')) / 100) < 0.02;
+}));
 
 // --- 2. layout, overflow, reveal, console/CSP por viewport ---
 const viewports = [
@@ -81,7 +95,8 @@ for (const vp of viewports) {
 
   // rola devagar até o fim pra disparar o IntersectionObserver
   await page.evaluate(async () => { for (let y = 0; y < document.body.scrollHeight; y += innerHeight / 2) { scrollTo(0, y); await new Promise((r) => setTimeout(r, 120)); } scrollTo(0, document.body.scrollHeight); });
-  await new Promise((r) => setTimeout(r, 700));
+  // espera o fade terminar (a rolagem é suave, então os últimos elementos entram por último)
+  await page.waitForFunction(() => [...document.querySelectorAll('.reveal')].every((el) => el.classList.contains('in') && getComputedStyle(el).opacity === '1'), { timeout: 4000 }).catch(() => {});
   const after = await page.evaluate(() => [...document.querySelectorAll('.reveal')].filter((el) => !el.classList.contains('in') || getComputedStyle(el).opacity !== '1').length);
   check(after === 0, `reveal: todos visíveis após scroll (${after} pendentes)`);
 
@@ -98,7 +113,9 @@ for (const vp of viewports) {
     .map((el) => el.textContent.trim().slice(0, 30)));
   check(small.length === 0, `alvos de toque ≥ 24px${small.length ? ' → ' + small.join(' | ') : ''}`);
 
-  await page.evaluate(() => scrollTo(0, 0));
+  // topo sem rolagem suave e animações concluídas, senão o screenshot pega tudo pela metade
+  await page.evaluate(() => scrollTo({ top: 0, behavior: 'instant' }));
+  await new Promise((r) => setTimeout(r, 2000));
   await page.screenshot({ path: join(out, `${vp.name}.png`), fullPage: true });
   check(errors.length === 0, `sem erros de console/CSP${errors.length ? ' → ' + errors.join(' | ') : ''}`);
   await page.close();
@@ -112,6 +129,8 @@ console.log('\n[prefers-reduced-motion]');
   await page.goto(base + '/', { waitUntil: 'networkidle0' });
   const hidden = await page.evaluate(() => [...document.querySelectorAll('.reveal')].filter((el) => getComputedStyle(el).opacity !== '1').length);
   check(hidden === 0, `nada oculto com movimento reduzido (${hidden})`);
+  check(JSON.stringify(await readTexts(page)) === JSON.stringify(finalTexts), 'números já no valor final, sem contagem');
+  check(await barsOk(page), 'barras já no tamanho final');
   await page.close();
 }
 
@@ -161,11 +180,13 @@ console.log('\n[WhatsApp]');
   const page = await browser.newPage();
   await page.goto(base + '/', { waitUntil: 'networkidle0' });
   const links = await page.$$eval('a[href*="wa.me"]', (as) => as.map((a) => ({ href: a.href, target: a.target, rel: a.rel, cta: a.dataset.cta, text: a.textContent.trim() })));
-  check(links.length === 3, `3 CTAs de WhatsApp (${links.length})`);
+  const tel = await page.$eval('a[href^="tel:"]', (a) => a.getAttribute('href').replace(/\D/g, ''));
+  check(links.length >= 3, `${links.length} CTAs de WhatsApp`);
+  check(new Set(links.map((l) => l.href)).size === 1, 'todos os links de WhatsApp iguais (número e mensagem)');
   for (const l of links) {
     const u = new URL(l.href);
-    check(u.hostname === 'wa.me' && u.pathname === '/5511942739425', `"${l.text}" → número 5511942739425`);
-    check(u.searchParams.get('text') === 'Olá, Victor! Vim pelo site e quero agendar uma avaliação.', `"${l.text}" → mensagem pré-preenchida`);
+    check(u.hostname === 'wa.me' && u.pathname === '/' + tel, `"${l.text}" → número ${tel} (o mesmo do telefone do rodapé)`);
+    check(!!u.searchParams.get('text'), `"${l.text}" → mensagem pré-preenchida`);
     check(l.target === '_blank' && l.rel.includes('noopener') && !!l.cta, `"${l.text}" → nova aba, noopener, data-cta="${l.cta}"`);
   }
   // clique dispara evento de conversão (sem navegar)
@@ -181,6 +202,24 @@ console.log('\n[WhatsApp]');
     const r = await fetch('https://wa.me/5511942739425', { redirect: 'manual' });
     check(r.status < 400, `wa.me responde (HTTP ${r.status})`);
   } catch (e) { console.log(`  aviso: sem rede pra testar wa.me (${e.message})`); }
+  await page.close();
+}
+
+// --- 4b. motion dos resultados: conta ao aparecer e termina no valor exato ---
+console.log('\n[motion]');
+{
+  const page = await browser.newPage();
+  await page.setViewport({ width: 390, height: 844, isMobile: true, hasTouch: true, deviceScaleFactor: 1 });
+  await page.goto(base + '/', { waitUntil: 'load' });
+  const els = await page.$$('.client-card');
+  await els[0].evaluate((e) => e.scrollIntoView({ block: 'center' }));
+  await new Promise((r) => setTimeout(r, 500));
+  const mid = await readTexts(page);
+  check(mid.some((t, i) => t !== finalTexts[i]), 'números contando quando o card aparece');
+  for (const e of els) { await e.evaluate((x) => x.scrollIntoView({ block: 'center' })); await new Promise((r) => setTimeout(r, 300)); }
+  await new Promise((r) => setTimeout(r, 2200));
+  check(JSON.stringify(await readTexts(page)) === JSON.stringify(finalTexts), `números terminam idênticos ao HTML (${finalTexts.length})`);
+  check(await barsOk(page), 'barras antes → depois no tamanho certo');
   await page.close();
 }
 
@@ -204,6 +243,8 @@ console.log('\n[SEO]');
   check(seo.desc.length >= 70 && seo.desc.length <= 160, `description ${seo.desc.length} chars`);
   check(seo.canonical === 'https://vfitcoachapp.com/' && seo.og && seo.h1 === 1 && seo.lang === 'pt-BR' && !!seo.ld, 'canonical, og:image, 1 h1, lang pt-BR, JSON-LD');
   for (const f of ['robots.txt', 'sitemap.xml', 'og.jpg', 'favicon.svg']) check((await fetch(`${base}/${f}`)).ok, `/${f} existe`);
+  const priv = await page.$eval('footer a[href="/privacidade"]', (a) => a.href).catch(() => null);
+  check(!!priv && (await fetch(priv)).ok, 'rodapé tem link para /privacidade e a página existe');
   await page.close();
 }
 
