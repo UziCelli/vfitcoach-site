@@ -16,12 +16,14 @@ Deu erro? Não publique. Desfaça com `git checkout public/index.html` e peça a
 
 | Quero mudar… | Procure por | Atenção |
 |---|---|---|
-| Número ou mensagem do WhatsApp | `wa.me/` | Aparece **3 vezes**. Mude todas. A mensagem é codificada (`%20` = espaço); gere em https://www.urlencoder.org |
+| Número ou mensagem do WhatsApp | `wa.me/` | Aparece **4 vezes**. Mude todas (o QA avisa se ficarem diferentes, ou diferentes do `tel:` do rodapé). A mensagem é codificada (`%20` = espaço); gere em https://www.urlencoder.org |
 | Link da agenda | `calendar.app.google` | Aparece **2 vezes**. |
 | Telefone do rodapé | `tel:+55` | Também está no bloco `application/ld+json` no topo (`telephone`). |
 | Instagram | `personal.victorcelli` | 3 lugares: rodapé, "Sobre" e JSON-LD no topo. |
 | Título do Google / descrição | `<title>` e `name="description"` | Título até 60 caracteres, descrição de 70 a 160. |
-| Cliente (números) | `===== RESULTADOS` | Para adicionar um: copie um `<article>…</article>` inteiro e troque os dados. **Só publique com autorização por escrito do cliente** (dado de saúde, LGPD). |
+| Cliente (números) | `===== RESULTADOS` | Troque só o texto de dentro: `<span class="de">antes</span>` e `<strong class="para">depois</strong>`. As barras e a contagem animada se ajustam sozinhas. Cliente novo: copie um `<article>…</article>` inteiro. |
+| Número grande do card | `class="destaque"` | Tem que ser **depois − antes** de uma das linhas do card (ex.: 110,4 − 120,8 = −10,4). Use `−` na frente pra queda e `+` pra ganho. O QA confere a conta. |
+| Nome do cliente | `class="name"` | **Só iniciais** (`G.` ou `G. S.`). O QA reprova nome completo (dado de saúde, LGPD). |
 | Serviços / FAQ | `===== SERVIÇOS` / `===== PERGUNTAS` | Pergunta nova: copie um `<details>…</details>`. |
 | Cores | `:root{` no começo do `<style>` | `--cta` é a cor dos botões. |
 | Política de privacidade | `public/privacidade.html` | Atualize a data no topo se mudar algo. Ferramenta nova de rastreamento (ex.: Meta Pixel) = citar lá. |
@@ -30,9 +32,10 @@ Deu erro? Não publique. Desfaça com `git checkout public/index.html` e peça a
 ## Não mexa
 
 - O bloco `<svg class="logo-mark">` (desenho do logo).
-- O `<script>` do final: é ele que conta os cliques de WhatsApp pro Google Ads. Se mudar algo, os atributos `data-cta="…"` dos botões precisam continuar lá.
+- Os `<script>` (um no `<head>`, um no final): contam os cliques de WhatsApp pro Google Ads e fazem as animações. Os atributos `data-cta="…"` dos botões precisam continuar lá.
+- O `<svg class="sprite">` logo depois do `<body>`: é o ícone do WhatsApp usado nos botões (`<use href="#i-wa"/>`).
 - `public/_headers`: é gerado automaticamente. Edite `scripts/headers.mjs` se precisar.
-- Nada de `onclick="…"` nem `<script src="…">` de outros sites: a CSP bloqueia (e o `npm run security` avisa).
+- Nada de `onclick="…"`, `style="…"` nem `<script src="…">` de outros sites: a CSP bloqueia (e o `npm run security` avisa). Estilo novo = uma classe no `<style>`.
 
 ## Comandos
 

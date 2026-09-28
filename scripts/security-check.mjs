@@ -23,6 +23,7 @@ for (const f of pages) {
   if (/<form\b/i.test(html)) bad(`${f}: tem <form> — precisa de proteção anti-spam/validação antes de publicar`);
   if (/<script[^>]+src=["']?https?:/i.test(html)) bad(`${f}: script externo (atualize a CSP e avalie o risco)`);
   if (/<[a-z]+\s[^>]*\son[a-z]+\s*=/i.test(html)) bad(`${f}: handler inline (onclick=...) — bloqueado pela CSP`);
+  if (/<[a-z][^>]*\sstyle\s*=/i.test(html)) bad(`${f}: atributo style="..." — bloqueado pela CSP (use uma classe no <style>)`);
   for (const a of html.match(/<a\b[^>]*target=["']?_blank[^>]*>/gi) || []) if (!/noopener|noreferrer/.test(a)) bad(`${f}: link _blank sem rel=noopener → ${a.slice(0, 80)}`);
   if (/href=["']http:\/\//i.test(html)) bad(`${f}: link http:// (sem HTTPS)`);
   // CSP desatualizada = script/estilo bloqueado em produção

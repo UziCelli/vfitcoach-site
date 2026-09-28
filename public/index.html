@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Personal trainer em São Paulo | VFITCOACH · Victor Celli</title>
-<meta name="description" content="Personal trainer em São Paulo. Treino presencial ou online, com avaliação física periódica e decisões baseadas em evidência.">
+<meta name="description" content="Personal trainer em São Paulo para emagrecer e ganhar força. Presencial ou online, com avaliação física periódica e resultados medidos.">
 <link rel="canonical" href="https://vfitcoachapp.com/">
 <meta name="theme-color" content="#0B1E3D">
 <link rel="icon" href="/favicon.svg" type="image/svg+xml">
@@ -29,6 +29,7 @@
 <script type="application/ld+json">
 {"@context":"https://schema.org","@type":"ProfessionalService","name":"VFITCOACH","description":"Personal trainer em São Paulo: treino presencial ou online, com avaliação física periódica.","url":"https://vfitcoachapp.com/","image":"https://vfitcoachapp.com/og.jpg","telephone":"+55 11 94273-9425","areaServed":{"@type":"City","name":"São Paulo"},"sameAs":["https://instagram.com/personal.victorcelli"],"founder":{"@type":"Person","name":"Victor Celli","jobTitle":"Personal trainer"}}
 </script>
+<script>if('IntersectionObserver' in window)document.documentElement.classList.add('js')</script>
 
 <style>
   @font-face{ font-family:'Montserrat'; src:url(/assets/fonts/montserrat.woff2) format('woff2'); font-weight:100 900; font-display:swap; }
@@ -46,13 +47,15 @@
     --card:#FFFFFF;
     --muted:#54607A;
     --border:#E1E6EE;
+    --hl:rgba(74,123,175,.28);          /* marca-texto dos títulos */
+    --bar-antes:#3F6A9C; --bar-depois:#A8D0FF; /* barras dos resultados (validadas p/ daltonismo) */
     color-scheme: light;
   }
   /* tema escuro automático (segue o celular/computador do visitante) */
   @media (prefers-color-scheme: dark){
     :root{
       --bg:#0A1424; --card:#101B30; --ink:#EDF1F8; --muted:#98A6C2; --border:#1E2C46;
-      --steel-light:#5C93CC; --accent-text:#7FAEDD;
+      --steel-light:#5C93CC; --accent-text:#7FAEDD; --hl:rgba(92,147,204,.38);
       color-scheme: dark;
     }
   }
@@ -80,6 +83,7 @@
   .wrap{ max-width:1080px; margin:0 auto; padding-inline:20px; }
   img{max-width:100%;height:auto;display:block;}
   svg.icon{ width:26px; height:26px; flex:0 0 auto; }
+  .sprite{ position:absolute; width:0; height:0; overflow:hidden; }
   #resultados{ scroll-margin-top:56px; }
 
   /* ---- reveal-on-scroll (só com JS ativo) ---- */
@@ -87,6 +91,24 @@
     .js .reveal{ opacity:0; transform:translateY(16px); transition:opacity .5s ease, transform .5s ease; }
     .js .reveal.in{ opacity:1; transform:none; }
   }
+
+  /* ---- motion: marca-texto nas palavras-chave + brilho nos botões de WhatsApp ---- */
+  .hl{ background:linear-gradient(var(--hl),var(--hl)) no-repeat 0 90% / 100% .34em; -webkit-box-decoration-break:clone; box-decoration-break:clone; }
+  .hero{ --hl:rgba(92,147,204,.55); }
+  .final-cta{ --hl:rgba(255,255,255,.22); }
+  .btn-accent{ position:relative; overflow:hidden; }
+  .btn-accent::after{ content:""; position:absolute; inset:0; pointer-events:none; transform:translateX(-101%);
+    background:linear-gradient(110deg, transparent 30%, rgba(255,255,255,.38) 50%, transparent 70%); }
+  @media (prefers-reduced-motion: no-preference){
+    .hero .hl{ animation:hl-in .9s cubic-bezier(.2,.7,.2,1) .5s both; }
+    .js .reveal .hl{ background-size:0 .34em; transition:background-size .9s cubic-bezier(.2,.7,.2,1) .4s; }
+    .js .reveal.in .hl{ background-size:100% .34em; }
+    /* 2 passadas e para (menos de 5 s): chama o olho sem virar pisca-pisca */
+    .hero .btn-accent::after{ animation:shine 1.2s ease-in-out 1.4s 2; }
+    .js .reveal.in .btn-accent::after{ animation:shine 1.2s ease-in-out .5s 2; }
+  }
+  @keyframes hl-in{ from{ background-size:0 .34em; } }
+  @keyframes shine{ to{ transform:translateX(101%); } }
 
   /* ---- top bar ---- */
   .topbar{
@@ -120,6 +142,9 @@
   .btn-ghost{ background:transparent; color:#fff; border-color:rgba(255,255,255,.35); }
   .btn-ghost:hover{ background:rgba(255,255,255,.08); }
   .btn-sm{ padding:9px 16px; font-size:13.5px; min-height:40px; }
+  .btn .i-wa{ width:18px; height:18px; fill:currentColor; flex:0 0 auto; }
+  .btn-sm .i-wa{ width:16px; height:16px; }
+  @media (max-width:359px){ .btn-sm .i-wa{ display:none; } }
 
   /* ---- hero ---- */
   .hero{
@@ -174,32 +199,77 @@
   .pillar h3{ font-size:17.5px; color:var(--ink); }
   .pillar p{ margin-top:8px; color:var(--muted); font-size:14px; }
 
-  /* ---- results ---- */
-  .results-bg{ background:var(--navy); color:#fff; }
-  .results-bg .kicker{ color:#8FB3DE; }
-  .results-bg .section-head h2{ color:#fff; }
+  /* ---- resultados: cards escuros sobre fundo claro ---- */
   .results-note{
     display:flex; gap:12px; align-items:flex-start;
-    background:rgba(255,255,255,.06); border:1px solid rgba(255,255,255,.14); border-radius:10px;
-    padding:14px 18px; margin-bottom:28px; max-width:70ch;
+    background:var(--card); border:1px solid var(--border); border-radius:10px;
+    padding:14px 18px; margin-bottom:20px; max-width:70ch;
   }
   .results-note .dot{ flex:0 0 auto; width:6px; height:6px; border-radius:50%; background:var(--steel-light); margin-top:8px; }
-  .results-note p{ font-size:13.5px; color:#C3D3EA; }
+  .results-note p{ font-size:13.5px; color:var(--muted); }
+  .legend{ display:none; }
+  .js .legend{ display:inline-flex; gap:16px; margin:0 0 14px; padding:7px 14px; border-radius:999px; background:var(--navy); color:#C3D3EA; font-size:12.5px; }
+  .legend span{ display:inline-flex; align-items:center; gap:7px; }
+  .legend span::before{ content:""; width:16px; height:12px; border-radius:0 4px 4px 0; background:var(--bar-antes); }
+  .legend span + span::before{ height:6px; border-radius:0 3px 3px 0; background:var(--bar-depois); }
   .results-grid{ display:grid; grid-template-columns:repeat(2,1fr); gap:16px; }
   @media (max-width:720px){ .results-grid{ grid-template-columns:1fr; } }
-  .client-card{ border:1px solid rgba(255,255,255,.14); border-radius:12px; padding:22px; background:rgba(255,255,255,.04); }
-  .client-card .who{ display:flex; justify-content:space-between; align-items:baseline; gap:10px; flex-wrap:wrap; }
-  .client-card .name{ font-size:18px; color:#fff; }
-  .client-card .meta{ font-size:12px; color:#9CB0D1; }
-  .client-card .modality{ display:inline-block; margin-top:8px; font-size:11px; font-weight:700; letter-spacing:.06em; text-transform:uppercase; color:#8FB3DE; }
-  .stat-row{ margin:18px 0 0; display:grid; gap:16px; }
-  .stat{ padding-top:14px; border-top:1px solid rgba(255,255,255,.14); }
-  .stat dt{ font-size:12.5px; color:#9CB0D1; margin-bottom:4px; }
-  .stat dd{
-    margin:0; font-variant-numeric:tabular-nums; font-size:22px; font-weight:800; color:#fff;
-    font-family:'Montserrat',sans-serif; display:flex; align-items:baseline; gap:8px; flex-wrap:wrap;
+  .client-card{
+    border:1px solid var(--border); border-radius:14px; padding:22px; color:#fff;
+    background:radial-gradient(420px 220px at 100% 0, rgba(74,123,175,.28), transparent 70%) var(--navy);
   }
-  .stat .arrow{ color:#8FB3DE; font-weight:400; font-size:16px; }
+  .client-card .who{ display:flex; align-items:center; gap:12px; }
+  .client-card .name{ flex:0 0 auto; width:40px; height:40px; border-radius:50%; display:grid; place-items:center; background:var(--steel); color:#fff; font-size:15px; }
+  .client-card .modality{ font-size:11px; font-weight:700; letter-spacing:.06em; text-transform:uppercase; color:#8FB3DE; }
+  .client-card .meta{ margin-left:auto; font-size:12.5px; color:#9CB0D1; white-space:nowrap; }
+  .destaque{ margin-top:18px; font-size:14px; color:#C3D3EA; }
+  .destaque strong{ display:block; margin-bottom:6px; font-family:'Montserrat',sans-serif; font-weight:800; font-size:clamp(40px,10vw,50px); line-height:1; letter-spacing:-.02em; color:#fff; }
+  .destaque .n{ display:inline-block; }
+  .destaque .u{ font-size:.46em; letter-spacing:0; color:#C3D3EA; }
+  .stat-row{ margin:16px 0 0; }
+  .stat{ position:relative; display:flex; justify-content:space-between; align-items:baseline; gap:12px; padding-block:12px; border-top:1px solid rgba(255,255,255,.12); }
+  .js .stat{ padding-bottom:32px; }
+  .stat dt{ font-size:13px; color:#9CB0D1; }
+  .stat dd{ margin:0; font-size:14.5px; color:#C3D3EA; white-space:nowrap; font-variant-numeric:tabular-nums; }
+  .stat .para{ display:inline-block; color:#fff; }
+  .stat .arrow{ color:#8FB3DE; }
+  /* barra antes → depois (montada pelo script): grossa e apagada = antes; fina e clara = depois */
+  .bar{ position:absolute; left:0; right:0; bottom:12px; height:12px; }
+  .bar i, .bar b{ position:absolute; left:0; }
+  .bar i{ top:0; height:12px; width:var(--a); border-radius:0 4px 4px 0; background:var(--bar-antes); }
+  .bar b{ top:3px; height:6px; width:var(--a); border-radius:0 3px 3px 0; background:var(--bar-depois); }
+  .in .bar b{ width:var(--b); transition:width 1.4s cubic-bezier(.22,.8,.26,1) .35s; }
+  @media (prefers-reduced-motion: reduce){ .bar b{ width:var(--b); } }
+
+  /* ---- como funciona ---- */
+  .how{ background:var(--card); }
+  .steps{ list-style:none; margin:0; padding:0; display:grid; gap:24px; counter-reset:passo; }
+  .steps li{ position:relative; padding-left:58px; counter-increment:passo; }
+  .steps li::before{ content:counter(passo); position:absolute; left:0; top:-9px; width:40px; height:40px; border-radius:50%; display:grid; place-items:center; background:var(--steel); color:#fff; font:800 17px/1 'Montserrat',sans-serif; }
+  .steps li:not(:last-child)::after{ content:""; position:absolute; left:19px; top:35px; bottom:-11px; width:2px; border-radius:1px; background:var(--steel-light); opacity:.45; transform-origin:top; }
+  .steps h3{ font-size:17px; line-height:1.3; }
+  .steps p{ margin-top:4px; color:var(--muted); font-size:14px; }
+  .how-cta{ margin-top:32px; }
+  @media (min-width:821px){
+    .steps{ grid-template-columns:repeat(3,1fr); gap:28px; }
+    .steps li{ padding:58px 12px 0 0; }
+    .steps li::before{ top:0; }
+    .steps li:not(:last-child)::after{ left:46px; right:-22px; top:19px; bottom:auto; width:auto; height:2px; transform-origin:left; }
+  }
+  /* 1 → linha → 2 → linha → 3 */
+  @media (prefers-reduced-motion: no-preference){
+    .js .steps li::before{ opacity:0; transform:scale(.5); transition:transform .5s cubic-bezier(.3,1.5,.5,1), opacity .25s; }
+    .js .steps li::after{ transform:scaleY(0); transition:transform .4s ease-out; }
+    .js .steps.in li::before{ opacity:1; transform:none; }
+    .js .steps.in li::after{ transform:none; }
+    .js .steps.in li:nth-child(1)::after{ transition-delay:.4s; }
+    .js .steps.in li:nth-child(2)::before{ transition-delay:.75s; }
+    .js .steps.in li:nth-child(2)::after{ transition-delay:1.15s; }
+    .js .steps.in li:nth-child(3)::before{ transition-delay:1.5s; }
+  }
+  @media (prefers-reduced-motion: no-preference) and (min-width:821px){
+    .js .steps li::after{ transform:scaleX(0); }
+  }
 
   /* ---- services ---- */
   .services-grid{ display:grid; grid-template-columns:repeat(3,1fr); gap:20px; }
@@ -236,6 +306,7 @@
   .final-cta p{ color:#E4EDF9; margin-top:12px; font-size:14.5px; }
   .final-cta .btn-accent{ background:#fff; color:var(--navy); margin-top:22px; }
   .final-cta .btn-accent:hover{ background:#EDF2F9; }
+  .final-cta .btn-accent::after{ background:linear-gradient(110deg, transparent 30%, rgba(63,114,166,.28) 50%, transparent 70%); }
 
   /* ---- footer ---- */
   footer{ background:var(--navy-2); color:#B9C9E4; padding-block:32px; font-size:13.5px; }
@@ -249,9 +320,10 @@
 <!--
   EDITANDO À MÃO — leia o EDITANDO.md. Resumo:
   - Textos: é só trocar entre as tags. Seções marcadas com "===== NOME =====".
-  - Link do WhatsApp aparece 3x (TOPO, HERO, CHAMADA FINAL) e o da agenda 2x: mude em todos.
+  - Link do WhatsApp aparece 4x (TOPO, HERO, COMO FUNCIONA, CHAMADA FINAL) e o da agenda 2x: mude em todos.
   - Depois: npm run qa (confere) e npm run deploy (publica; a CSP é atualizada sozinha).
 -->
+<svg class="sprite" aria-hidden="true" focusable="false"><symbol id="i-wa" viewBox="0 0 24 24"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413Z"/></symbol></svg>
 
 <!-- ===== TOPO ===== -->
 <header class="topbar">
@@ -295,7 +367,7 @@
       </svg>
       <svg class="logo-icon" viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg" aria-hidden="true" focusable="false"><path fill="#FFFFFF" fill-rule="evenodd" d="M0 100A100 100 0 1 0 200 100A100 100 0 1 0 0 100ZM40.61 128.69 18.68 71.31H34.37L48.31 108.69L62.54 71.31H76.92L54.92 128.69ZM83.72 128.69V71.31H124V83.85H98.25V96.47H120.92V109.01H98.25V128.69ZM159.15 129.79Q166.29 129.79 171.93 127.06Q177.56 124.31 181.32 119.3L172.04 110.23Q169.53 113.42 166.56 115.09Q163.57 116.75 159.88 116.75Q156.72 116.75 154.07 115.65Q151.42 114.54 149.54 112.43Q147.66 110.32 146.6 107.38Q145.53 104.44 145.53 100.86Q145.53 97.28 146.6 94.34Q147.66 91.4 149.54 89.29Q151.42 87.18 154.07 86.07Q156.72 84.95 159.88 84.95Q163.57 84.95 166.56 86.62Q169.53 88.3 172.04 91.47L181.32 82.41Q177.56 77.32 171.93 74.62Q166.29 71.92 159.15 71.92Q153.04 71.92 147.85 74.02Q142.65 76.13 138.86 80.03Q135.07 83.92 132.93 89.2Q130.8 94.49 130.8 100.86Q130.8 107.22 132.93 112.5Q135.07 117.79 138.86 121.68Q142.65 125.59 147.85 127.69Q153.04 129.79 159.15 129.79Z"/></svg>
     </a>
-    <a class="btn btn-accent btn-sm" data-cta="topo" href="https://wa.me/5511942739425?text=Ol%C3%A1%2C%20Victor!%20Vim%20pelo%20site%20e%20quero%20agendar%20uma%20avalia%C3%A7%C3%A3o." target="_blank" rel="noopener">Falar no WhatsApp</a>
+    <a class="btn btn-accent btn-sm" data-cta="topo" href="https://wa.me/5511942739425?text=Ol%C3%A1%2C%20Victor!%20Vim%20pelo%20site%20e%20quero%20agendar%20uma%20avalia%C3%A7%C3%A3o." target="_blank" rel="noopener"><svg class="i-wa" aria-hidden="true" focusable="false"><use href="#i-wa"/></svg>Falar no WhatsApp</a>
   </div>
 </header>
 
@@ -305,10 +377,10 @@
     <div class="wrap hero-grid">
       <div class="hero-copy">
         <span class="eyebrow">Personal trainer · São Paulo</span>
-        <h1>Aqui você aprende a se mover com confiança, não com medo.</h1>
-        <p class="sub">Treino presencial ou online, com avaliação física periódica e decisões baseadas em evidência. Sem promessa de resultado da noite pro dia.</p>
+        <h1>Aqui você aprende a se mover <span class="hl">com confiança</span>, não com medo.</h1>
+        <p class="sub">Treino presencial ou online pra emagrecer e ganhar força, com avaliação física periódica e decisões baseadas em evidência. Sem promessa de resultado da noite pro dia.</p>
         <div class="hero-actions">
-          <a class="btn btn-accent" data-cta="hero" href="https://wa.me/5511942739425?text=Ol%C3%A1%2C%20Victor!%20Vim%20pelo%20site%20e%20quero%20agendar%20uma%20avalia%C3%A7%C3%A3o." target="_blank" rel="noopener">Agendar avaliação no WhatsApp</a>
+          <a class="btn btn-accent" data-cta="hero" href="https://wa.me/5511942739425?text=Ol%C3%A1%2C%20Victor!%20Vim%20pelo%20site%20e%20quero%20agendar%20uma%20avalia%C3%A7%C3%A3o." target="_blank" rel="noopener"><svg class="i-wa" aria-hidden="true" focusable="false"><use href="#i-wa"/></svg>Agendar avaliação no WhatsApp</a>
           <a class="btn btn-ghost" href="#resultados">Ver resultados reais</a>
         </div>
         <p class="alt-cta">Prefere marcar direto? <a data-cta="agenda-hero" href="https://calendar.app.google/yYdC11bdCtNab2xd6" target="_blank" rel="noopener">Escolha um horário na agenda</a></p>
@@ -330,121 +402,128 @@
     </div>
   </section>
 
-  <!-- ===== MÉTODO ===== -->
-  <section aria-labelledby="h-metodo">
-    <div class="wrap">
-      <div class="section-head reveal">
-        <span class="kicker">Método</span>
-        <h2 id="h-metodo">Treino sério não precisa de medo nem de milagre</h2>
-      </div>
-      <div class="pillars">
-        <div class="pillar reveal">
-          <svg class="icon" aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M3 12h4M17 12h4M7 12a2 2 0 0 1 2-2h6a2 2 0 0 1 2 2 2 2 0 0 1-2 2H9a2 2 0 0 1-2-2Z"/><path d="M5 9v6M19 9v6"/></svg>
-          <h3>Base técnica, não achismo</h3>
-          <p>Carga e progressão embasadas em literatura científica, sem alarmismo sobre risco de lesão.</p>
-        </div>
-        <div class="pillar reveal">
-          <svg class="icon" aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M3 3v16a2 2 0 0 0 2 2h16"/><path d="M7 15l4-4 3 3 6-7"/></svg>
-          <h3>Acompanhamento com dados</h3>
-          <p>Avaliação física recorrente e ajuste de treino a cada 4–5 semanas. Sua evolução, em números.</p>
-        </div>
-        <div class="pillar reveal">
-          <svg class="icon" aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><circle cx="12" cy="8" r="4"/><path d="M4 21c0-4 3.6-7 8-7s8 3 8 7"/></svg>
-          <h3>Cada corpo é um corpo</h3>
-          <p>Morfologia diferente não é erro. O trabalho é te colocar em movimento, com consistência.</p>
-        </div>
-      </div>
-    </div>
-  </section>
-
   <!-- ===== RESULTADOS (cards de clientes) ===== -->
-  <section class="results-bg" id="resultados" aria-labelledby="h-resultados">
+  <section class="results" id="resultados" aria-labelledby="h-resultados">
     <div class="wrap">
       <div class="section-head reveal">
         <span class="kicker">Resultados</span>
-        <h2 id="h-resultados">Prova social com números, não com fotos</h2>
+        <h2 id="h-resultados">Resultados <span class="hl">medidos</span>, não prometidos</h2>
       </div>
 
       <div class="results-note reveal">
         <span class="dot" aria-hidden="true"></span>
-        <p>Dados reais de clientes da VFITCOACH, direto das fichas de avaliação física — sem fotos, por princípio.</p>
+        <p>Números reais das fichas de avaliação física. Sem fotos e só com as iniciais, por respeito aos clientes. Resultados variam de pessoa para pessoa.</p>
       </div>
+
+      <p class="legend" aria-hidden="true"><span>antes</span><span>depois</span></p>
 
       <div class="results-grid">
 
-        <!-- Para adicionar um cliente: copie um <article> inteiro e troque nome, tempo, modalidade e números. -->
+        <!-- Um cliente = um <article>. Pra adicionar: copie um inteiro e troque iniciais, modalidade, tempo e números.
+             "destaque" = a maior melhora (depois − antes). As barras e os números animados se ajustam sozinhos. -->
         <article class="client-card reveal">
           <div class="who">
-            <h3 class="name">Maykon</h3>
+            <h3 class="name">G.</h3>
+            <span class="modality">Consultoria</span>
+            <span class="meta">7 meses</span>
+          </div>
+          <p class="destaque"><strong>−10,4 kg</strong> de peso corporal</p>
+          <dl class="stat-row">
+            <div class="stat">
+              <dt>Peso corporal</dt>
+              <dd><span class="de">120,8 kg</span> <span class="arrow" role="img" aria-label="para">→</span> <strong class="para">110,4 kg</strong></dd>
+            </div>
+            <div class="stat">
+              <dt>Cintura</dt>
+              <dd><span class="de">111,3 cm</span> <span class="arrow" role="img" aria-label="para">→</span> <strong class="para">102 cm</strong></dd>
+            </div>
+          </dl>
+        </article>
+
+        <article class="client-card reveal">
+          <div class="who">
+            <h3 class="name">M.</h3>
+            <span class="modality">Consultoria online</span>
             <span class="meta">14 meses</span>
           </div>
-          <span class="modality">Consultoria online</span>
+          <p class="destaque"><strong>+79 kg</strong> de carga no agachamento</p>
           <dl class="stat-row">
             <div class="stat">
               <dt>1RM no agachamento</dt>
-              <dd>67 kg <span class="arrow" aria-label="para">→</span> 146 kg</dd>
+              <dd><span class="de">67 kg</span> <span class="arrow" role="img" aria-label="para">→</span> <strong class="para">146 kg</strong></dd>
             </div>
             <div class="stat">
               <dt>Cintura</dt>
-              <dd>110 cm <span class="arrow" aria-label="para">→</span> 104,5 cm</dd>
+              <dd><span class="de">110 cm</span> <span class="arrow" role="img" aria-label="para">→</span> <strong class="para">104,5 cm</strong></dd>
             </div>
           </dl>
         </article>
 
         <article class="client-card reveal">
           <div class="who">
-            <h3 class="name">Gregory</h3>
-            <span class="meta">7 meses</span>
-          </div>
-          <span class="modality">Consultoria</span>
-          <dl class="stat-row">
-            <div class="stat">
-              <dt>Peso corporal</dt>
-              <dd>120,8 kg <span class="arrow" aria-label="para">→</span> 110,4 kg</dd>
-            </div>
-            <div class="stat">
-              <dt>Cintura</dt>
-              <dd>111,3 cm <span class="arrow" aria-label="para">→</span> 102 cm</dd>
-            </div>
-          </dl>
-        </article>
-
-        <article class="client-card reveal">
-          <div class="who">
-            <h3 class="name">Giuliana</h3>
+            <h3 class="name">G.</h3>
+            <span class="modality">Acompanhamento presencial</span>
             <span class="meta">13 meses</span>
           </div>
-          <span class="modality">Acompanhamento presencial</span>
+          <p class="destaque"><strong>−16,3 kg</strong> de peso corporal</p>
           <dl class="stat-row">
             <div class="stat">
               <dt>Peso corporal</dt>
-              <dd>73,3 kg <span class="arrow" aria-label="para">→</span> 57 kg</dd>
+              <dd><span class="de">73,3 kg</span> <span class="arrow" role="img" aria-label="para">→</span> <strong class="para">57 kg</strong></dd>
             </div>
             <div class="stat">
               <dt>% de gordura</dt>
-              <dd>29,4% <span class="arrow" aria-label="para">→</span> 18,5%</dd>
+              <dd><span class="de">29,4%</span> <span class="arrow" role="img" aria-label="para">→</span> <strong class="para">18,5%</strong></dd>
             </div>
           </dl>
         </article>
 
         <article class="client-card reveal">
           <div class="who">
-            <h3 class="name">Inajara</h3>
+            <h3 class="name">I.</h3>
+            <span class="modality">Consultoria</span>
             <span class="meta">6 meses</span>
           </div>
-          <span class="modality">Consultoria</span>
+          <p class="destaque"><strong>−3 pontos</strong> no % de gordura, ganhando massa magra</p>
           <dl class="stat-row">
             <div class="stat">
               <dt>% de gordura</dt>
-              <dd>20% <span class="arrow" aria-label="para">→</span> 17%</dd>
+              <dd><span class="de">20%</span> <span class="arrow" role="img" aria-label="para">→</span> <strong class="para">17%</strong></dd>
             </div>
             <div class="stat">
               <dt>Massa magra</dt>
-              <dd>48 kg <span class="arrow" aria-label="para">→</span> 48,6 kg</dd>
+              <dd><span class="de">48 kg</span> <span class="arrow" role="img" aria-label="para">→</span> <strong class="para">48,6 kg</strong></dd>
             </div>
           </dl>
         </article>
 
+      </div>
+    </div>
+  </section>
+
+  <!-- ===== COMO FUNCIONA ===== -->
+  <section class="how" aria-labelledby="h-passos">
+    <div class="wrap">
+      <div class="section-head reveal">
+        <span class="kicker">Como funciona</span>
+        <h2 id="h-passos">Do primeiro “oi” à evolução medida, em <span class="hl">3 passos</span></h2>
+      </div>
+      <ol class="steps reveal">
+        <li>
+          <h3>Você chama no WhatsApp</h3>
+          <p>Conta sua rotina e seu objetivo. Sem compromisso.</p>
+        </li>
+        <li>
+          <h3>Avaliação física</h3>
+          <p>Peso, medidas, % de gordura e força: o seu ponto de partida.</p>
+        </li>
+        <li>
+          <h3>Treino com reavaliação</h3>
+          <p>Ajuste a cada 4–5 semanas, com a sua evolução em números.</p>
+        </li>
+      </ol>
+      <div class="how-cta reveal">
+        <a class="btn btn-accent" data-cta="passos" href="https://wa.me/5511942739425?text=Ol%C3%A1%2C%20Victor!%20Vim%20pelo%20site%20e%20quero%20agendar%20uma%20avalia%C3%A7%C3%A3o." target="_blank" rel="noopener"><svg class="i-wa" aria-hidden="true" focusable="false"><use href="#i-wa"/></svg>Começar pelo passo 1</a>
       </div>
     </div>
   </section>
@@ -487,6 +566,33 @@
             <li>Acompanhamento à distância</li>
           </ul>
           <span class="price-note">Pra quem já corre ou quer começar com segurança</span>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===== MÉTODO ===== -->
+  <section aria-labelledby="h-metodo">
+    <div class="wrap">
+      <div class="section-head reveal">
+        <span class="kicker">Método</span>
+        <h2 id="h-metodo">Treino sério não precisa de medo nem de milagre</h2>
+      </div>
+      <div class="pillars">
+        <div class="pillar reveal">
+          <svg class="icon" aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M3 12h4M17 12h4M7 12a2 2 0 0 1 2-2h6a2 2 0 0 1 2 2 2 2 0 0 1-2 2H9a2 2 0 0 1-2-2Z"/><path d="M5 9v6M19 9v6"/></svg>
+          <h3>Base técnica, não achismo</h3>
+          <p>Carga e progressão embasadas em literatura científica, sem alarmismo sobre risco de lesão.</p>
+        </div>
+        <div class="pillar reveal">
+          <svg class="icon" aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M3 3v16a2 2 0 0 0 2 2h16"/><path d="M7 15l4-4 3 3 6-7"/></svg>
+          <h3>Acompanhamento com dados</h3>
+          <p>Avaliação física recorrente e ajuste de treino a cada 4–5 semanas. Sua evolução, em números.</p>
+        </div>
+        <div class="pillar reveal">
+          <svg class="icon" aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><circle cx="12" cy="8" r="4"/><path d="M4 21c0-4 3.6-7 8-7s8 3 8 7"/></svg>
+          <h3>Cada corpo é um corpo</h3>
+          <p>Morfologia diferente não é erro. O trabalho é te colocar em movimento, com consistência.</p>
         </div>
       </div>
     </div>
@@ -549,10 +655,10 @@
 
   <!-- ===== CHAMADA FINAL ===== -->
   <section class="final-cta" aria-labelledby="h-cta">
-    <div class="wrap">
-      <h2 id="h-cta">O primeiro passo é uma conversa, não um contrato</h2>
+    <div class="wrap reveal">
+      <h2 id="h-cta">O primeiro passo é <span class="hl">uma conversa</span>, não um contrato</h2>
       <p>Manda sua rotina e objetivo — a resposta já traz os próximos passos.</p>
-      <a class="btn btn-accent" data-cta="final" href="https://wa.me/5511942739425?text=Ol%C3%A1%2C%20Victor!%20Vim%20pelo%20site%20e%20quero%20agendar%20uma%20avalia%C3%A7%C3%A3o." target="_blank" rel="noopener">Falar com Victor no WhatsApp</a>
+      <a class="btn btn-accent" data-cta="final" href="https://wa.me/5511942739425?text=Ol%C3%A1%2C%20Victor!%20Vim%20pelo%20site%20e%20quero%20agendar%20uma%20avalia%C3%A7%C3%A3o." target="_blank" rel="noopener"><svg class="i-wa" aria-hidden="true" focusable="false"><use href="#i-wa"/></svg>Falar com Victor no WhatsApp</a>
       <p class="alt-cta">Prefere marcar direto? <a data-cta="agenda-final" href="https://calendar.app.google/yYdC11bdCtNab2xd6" target="_blank" rel="noopener">Escolha um horário na agenda</a></p>
     </div>
   </section>
@@ -596,15 +702,75 @@
       dl.push({ event: ev, cta: a.getAttribute('data-cta') });
     });
 
-    var els = document.querySelectorAll('.reveal');
-    if(!('IntersectionObserver' in window)) return;
-    document.documentElement.classList.add('js');
+    // ---- Motion: seções aparecem ao rolar; nos resultados, os números contam e as barras vão de antes → depois.
+    // Tudo lê os números do próprio texto do HTML: pra mudar um cliente, basta editar o texto.
+    if(!document.documentElement.classList.contains('js')) return; // a classe vem do <script> no <head>
+    var calm = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+    // "−10,4 kg" → { head: '−10,4', pre: '−', n: 10.4, dec: 1, suf: ' kg' }
+    function parse(text){
+      var m = /^(\D*?)(\d[\d.]*(?:,\d+)?)(.*)$/.exec(text.trim());
+      return m && { head: m[1] + m[2], pre: m[1], n: +m[2].replace(/\./g, '').replace(',', '.'), dec: (m[2].split(',')[1] || '').length, suf: m[3] };
+    }
+    function fmt(p, v){
+      return (v ? p.pre : '') + v.toLocaleString('pt-BR', { minimumFractionDigits: p.dec, maximumFractionDigits: p.dec });
+    }
+    // Conta de "from" até o número do texto; no último quadro devolve o texto original, exato.
+    function count(el, from, delay){
+      var text = el.textContent, p = parse(text);
+      if(!p) return;
+      el.style.width = el.getBoundingClientRect().width + 'px'; // largura travada: nada pula enquanto conta
+      el.textContent = fmt(p, from) + p.suf;
+      setTimeout(function(){
+        var t0 = performance.now();
+        requestAnimationFrame(function frame(now){
+          var k = Math.min(1, (now - t0) / 1400);
+          el.textContent = k < 1 ? fmt(p, from + (p.n - from) * (1 - Math.pow(1 - k, 3))) + p.suf : text;
+          if(k < 1) requestAnimationFrame(frame); else el.style.width = '';
+        });
+      }, delay);
+    }
+
+    // Número do destaque grande + unidade menor ("−10,4" "kg")
+    document.querySelectorAll('.destaque strong').forEach(function(el){
+      var p = parse(el.textContent);
+      if(!p) return;
+      var n = document.createElement('span'), u = document.createElement('span');
+      n.className = 'n'; n.textContent = p.head;
+      u.className = 'u'; u.textContent = p.suf;
+      el.replaceChildren(n, u);
+    });
+    // Barra antes → depois em cada linha de número (escala começa no zero)
+    document.querySelectorAll('.stat dd').forEach(function(dd){
+      var de = dd.querySelector('.de'), para = dd.querySelector('.para');
+      var a = de && parse(de.textContent), b = para && parse(para.textContent);
+      if(!a || !b) return;
+      var max = Math.max(a.n, b.n) || 1, bar = document.createElement('span');
+      bar.className = 'bar';
+      bar.setAttribute('aria-hidden', 'true');
+      bar.style.setProperty('--a', a.n / max * 100 + '%');
+      bar.style.setProperty('--b', b.n / max * 100 + '%');
+      bar.append(document.createElement('i'), document.createElement('b'));
+      dd.append(bar);
+    });
+
     var io = new IntersectionObserver(function(entries){
       entries.forEach(function(entry){
-        if(entry.isIntersecting){ entry.target.classList.add('in'); io.unobserve(entry.target); }
+        if(!entry.isIntersecting) return;
+        var el = entry.target;
+        el.classList.add('in');
+        io.unobserve(el);
+        if(calm) return;
+        document.fonts.ready.then(function(){
+          el.querySelectorAll('.destaque .n').forEach(function(n){ count(n, 0, 150); });
+          el.querySelectorAll('.stat dd').forEach(function(dd){
+            var de = dd.querySelector('.de'), para = dd.querySelector('.para'), a = de && parse(de.textContent);
+            if(a && para) count(para, a.n, 350);
+          });
+        });
       });
     }, { threshold: 0.15, rootMargin: '0px 0px -40px 0px' });
-    els.forEach(function(el){ io.observe(el); });
+    document.querySelectorAll('.reveal').forEach(function(el){ io.observe(el); });
   })();
 </script>
 </body>

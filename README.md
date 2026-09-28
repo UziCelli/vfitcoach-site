@@ -36,7 +36,7 @@ Primeira vez numa máquina nova: `npx wrangler login`.
 ## Google Ads — conversões
 
 Google Tag Manager `GTM-WN5LPTMX` instalado (carrega após o `load` da página). Cada clique envia para o `dataLayer`:
-- WhatsApp: `{ event: 'whatsapp_click', cta: 'topo' | 'hero' | 'final' }`
+- WhatsApp: `{ event: 'whatsapp_click', cta: 'topo' | 'hero' | 'passos' | 'final' }`
 - Agenda: `{ event: 'schedule_click', cta: 'agenda-hero' | 'agenda-final' }`
 - Telefone: `{ event: 'phone_click', cta: 'telefone' }`
 
@@ -44,6 +44,14 @@ No GTM: acionador "Evento personalizado = whatsapp_click" → tag de conversão 
 Domínios do Google liberados na CSP ficam em `scripts/headers.mjs` (objeto `g`). Tag nova de outro fornecedor = liberar o domínio lá, `npm run qa`, `npm run deploy`. Evite tags "HTML personalizado": a CSP bloqueia scripts inline não autorizados.
 
 Os links de WhatsApp abrem com a mensagem "Olá, Victor! Vim pelo site e quero agendar uma avaliação." — assim dá pra identificar no WhatsApp quem veio do site.
+
+## Motion (animações)
+
+Sem biblioteca externa: CSS + JavaScript nativo do navegador (IntersectionObserver, transições), então a página continua leve (Lighthouse 100) e sem código de terceiros.
+- Seções aparecem ao rolar; palavras-chave dos títulos ganham um marca-texto (`<span class="hl">`).
+- Resultados: o número grande conta a partir de 0 e cada linha mostra uma barra antes → depois, montada a partir do próprio texto (`.de` / `.para`).
+- "Como funciona": os passos 1 → 2 → 3 acendem em sequência. Botões de WhatsApp dão 2 brilhos ao aparecer e param.
+- Quem usa "reduzir movimento" no celular/computador vê tudo parado, já no valor final.
 
 ## Trocar a foto
 
