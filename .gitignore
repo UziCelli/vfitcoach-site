@@ -8,3 +8,10 @@ qa-out/
 !.dev.vars.example
 .env*
 !.env.example
+
+# lixo de sistema e logs (o hook de fim de turno faz "git add -A")
+.DS_Store
+Thumbs.db
+desktop.ini
+*.log
+.claude/settings.local.json

@@ -26,6 +26,7 @@ const types = { '.html': 'text/html; charset=utf-8', '.svg': 'image/svg+xml', '.
 const server = http.createServer(async (req, res) => {
   let path = decodeURIComponent(new URL(req.url, 'http://x').pathname);
   if (path.endsWith('/')) path += 'index.html';
+  else if (!extname(path)) path += '.html'; // /privacidade → privacidade.html, como no Cloudflare
   const file = normalize(join(pub, path));
   let body, status = 200;
   try { if (!file.startsWith(pub)) throw 0; body = await readFile(file); }
@@ -46,14 +47,15 @@ console.log(`servidor local: ${base}`);
 
 const browser = await launch();
 
-// --- 1. dados dos clientes idênticos ao protótipo ---
+// --- 1. cards de clientes completos (nome, tempo, modalidade e ao menos 1 número "antes → depois") ---
 console.log('\n[dados de clientes]');
-const cardsText = (html) => [...html.matchAll(/<article class="client-card[\s\S]*?<\/article>/g)]
-  .map((m) => m[0].replace(/<[^>]+>/g, ' ').replace(/\s+/g, ' ').trim());
-const proto = cardsText(await readFile(join(root, 'src/prototipo.html'), 'utf8'));
-const built = cardsText(await readFile(join(pub, 'index.html'), 'utf8'));
-check(proto.length === 4 && built.length === 4, `4 cards de cliente (protótipo ${proto.length}, site ${built.length})`);
-proto.forEach((t, i) => check(t === built[i], `card ${i + 1} idêntico: "${t}"`));
+const cards = [...(await readFile(join(pub, 'index.html'), 'utf8')).matchAll(/<article class="client-card[\s\S]*?<\/article>/g)].map((m) => m[0]);
+check(cards.length > 0, `${cards.length} cards de cliente`);
+for (const c of cards) {
+  const name = c.match(/class="name">([^<]*)</)?.[1]?.trim();
+  const stats = [...c.matchAll(/<dt>[^<]+<\/dt>\s*<dd>[^<]+<span class="arrow"[^>]*>→<\/span>[^<]+<\/dd>/g)].length;
+  check(!!name && /class="meta">[^<]+</.test(c) && /class="modality">[^<]+</.test(c) && stats > 0, `card "${name || '?'}" completo (${stats} números)`);
+}
 
 // --- 2. layout, overflow, reveal, console/CSP por viewport ---
 const viewports = [
@@ -204,6 +206,8 @@ console.log('\n[SEO]');
   check(seo.desc.length >= 70 && seo.desc.length <= 160, `description ${seo.desc.length} chars`);
   check(seo.canonical === 'https://vfitcoachapp.com/' && seo.og && seo.h1 === 1 && seo.lang === 'pt-BR' && !!seo.ld, 'canonical, og:image, 1 h1, lang pt-BR, JSON-LD');
   for (const f of ['robots.txt', 'sitemap.xml', 'og.jpg', 'favicon.svg']) check((await fetch(`${base}/${f}`)).ok, `/${f} existe`);
+  const priv = await page.$eval('footer a[href="/privacidade"]', (a) => a.href).catch(() => null);
+  check(!!priv && (await fetch(priv)).ok, 'rodapé tem link para /privacidade e a página existe');
   await page.close();
 }
 

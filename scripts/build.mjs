@@ -1,6 +1,6 @@
-// Gera tudo que o index.html referencia. Rode após mudar foto, fontes ou <script>/<style> inline.
+// Gera imagens, fontes, favicon, og.jpg, sitemap e _headers. Rode após trocar a foto ou as fontes.
+// Só editou texto/CSS/JS do index.html? Não precisa: o deploy já regera o _headers.
 import { readFile, writeFile, copyFile, mkdir } from 'node:fs/promises';
-import { createHash } from 'node:crypto';
 import { fileURLToPath, pathToFileURL } from 'node:url';
 import sharp from 'sharp';
 
@@ -67,45 +67,7 @@ await writeFile(pub('sitemap.xml'), `<?xml version="1.0" encoding="UTF-8"?>
 </urlset>
 `);
 
-// Headers de segurança (Cloudflare Pages / Netlify). CSP com hash exato de cada <script>/<style> inline.
-const sha = (s) => `'sha256-${createHash('sha256').update(s).digest('base64')}'`;
-const hashes = (file, tag) => [...file.matchAll(new RegExp(`<${tag}>([\\s\\S]*?)</${tag}>`, 'g'))].map((m) => sha(m[1]));
-const page404 = await readFile(pub('404.html'), 'utf8');
-const js = [...new Set([...hashes(html, 'script'), ...hashes(page404, 'script')])];
-const css = [...new Set([...hashes(html, 'style'), ...hashes(page404, 'style')])];
-// Google Tag Manager + conversões do Google Ads (domínios da documentação de CSP do Google).
-const g = {
-  script: 'https://*.googletagmanager.com https://www.googleadservices.com https://www.google.com https://googleads.g.doubleclick.net',
-  img: 'https://*.googletagmanager.com https://*.google-analytics.com https://www.google.com https://www.google.com.br https://*.doubleclick.net https://www.googleadservices.com',
-  connect: 'https://*.googletagmanager.com https://*.google-analytics.com https://*.analytics.google.com https://www.google.com https://*.doubleclick.net https://www.googleadservices.com https://pagead2.googlesyndication.com',
-  frame: 'https://*.googletagmanager.com https://td.doubleclick.net https://www.google.com',
-};
-const csp = [
-  "default-src 'self'",
-  `script-src 'self' ${js.join(' ')} ${g.script}`,
-  `style-src 'self' ${css.join(' ')}`,
-  `img-src 'self' data: ${g.img}`,
-  "font-src 'self'",
-  `connect-src 'self' ${g.connect}`,
-  `frame-src ${g.frame}`,
-  "object-src 'none'",
-  "base-uri 'self'",
-  "form-action 'none'",
-  "frame-ancestors 'none'",
-  'upgrade-insecure-requests',
-].join('; ');
-await writeFile(pub('_headers'), `/*
-  Content-Security-Policy: ${csp}
-  Strict-Transport-Security: max-age=31536000; includeSubDomains
-  X-Content-Type-Options: nosniff
-  X-Frame-Options: DENY
-  Referrer-Policy: strict-origin-when-cross-origin
-  Permissions-Policy: camera=(), microphone=(), geolocation=(), payment=(), usb=()
-  Cross-Origin-Opener-Policy: same-origin
-
-/assets/*
-  Cache-Control: public, max-age=31536000, immutable
-`);
-// ponytail: cache imutável com nome fixo — se trocar a foto, renomeie o arquivo (ex.: victor2-680.webp).
+// Headers de segurança (CSP com hash dos <script>/<style> inline)
+await import('./headers.mjs');
 
 console.log('build ok');

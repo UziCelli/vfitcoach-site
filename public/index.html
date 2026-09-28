@@ -48,17 +48,13 @@
     --border:#E1E6EE;
     color-scheme: light;
   }
+  /* tema escuro automático (segue o celular/computador do visitante) */
   @media (prefers-color-scheme: dark){
-    :root:not([data-theme="light"]){
+    :root{
       --bg:#0A1424; --card:#101B30; --ink:#EDF1F8; --muted:#98A6C2; --border:#1E2C46;
       --steel-light:#5C93CC; --accent-text:#7FAEDD;
       color-scheme: dark;
     }
-  }
-  :root[data-theme="dark"]{
-    --bg:#0A1424; --card:#101B30; --ink:#EDF1F8; --muted:#98A6C2; --border:#1E2C46;
-    --steel-light:#5C93CC; --accent-text:#7FAEDD;
-    color-scheme: dark;
   }
 
   *{box-sizing:border-box;}
@@ -250,7 +246,14 @@
 </style>
 </head>
 <body>
+<!--
+  EDITANDO À MÃO — leia o EDITANDO.md. Resumo:
+  - Textos: é só trocar entre as tags. Seções marcadas com "===== NOME =====".
+  - Link do WhatsApp aparece 3x (TOPO, HERO, CHAMADA FINAL) e o da agenda 2x: mude em todos.
+  - Depois: npm run qa (confere) e npm run deploy (publica; a CSP é atualizada sozinha).
+-->
 
+<!-- ===== TOPO ===== -->
 <header class="topbar">
   <div class="wrap">
     <a class="brand" href="/" aria-label="VFITCOACH, início">
@@ -297,6 +300,7 @@
 </header>
 
 <main>
+  <!-- ===== HERO (primeira dobra) ===== -->
   <section class="hero">
     <div class="wrap hero-grid">
       <div class="hero-copy">
@@ -326,6 +330,7 @@
     </div>
   </section>
 
+  <!-- ===== MÉTODO ===== -->
   <section aria-labelledby="h-metodo">
     <div class="wrap">
       <div class="section-head reveal">
@@ -352,6 +357,7 @@
     </div>
   </section>
 
+  <!-- ===== RESULTADOS (cards de clientes) ===== -->
   <section class="results-bg" id="resultados" aria-labelledby="h-resultados">
     <div class="wrap">
       <div class="section-head reveal">
@@ -366,6 +372,7 @@
 
       <div class="results-grid">
 
+        <!-- Para adicionar um cliente: copie um <article> inteiro e troque nome, tempo, modalidade e números. -->
         <article class="client-card reveal">
           <div class="who">
             <h3 class="name">Maykon</h3>
@@ -442,6 +449,7 @@
     </div>
   </section>
 
+  <!-- ===== SERVIÇOS ===== -->
   <section aria-labelledby="h-servicos">
     <div class="wrap">
       <div class="section-head reveal">
@@ -484,6 +492,7 @@
     </div>
   </section>
 
+  <!-- ===== SOBRE ===== -->
   <section class="about" aria-labelledby="h-sobre">
     <div class="wrap about-grid">
       <div class="about-photo reveal">
@@ -506,6 +515,7 @@
     </div>
   </section>
 
+  <!-- ===== PERGUNTAS FREQUENTES ===== -->
   <section aria-labelledby="h-faq">
     <div class="wrap">
       <div class="section-head reveal">
@@ -537,6 +547,7 @@
     </div>
   </section>
 
+  <!-- ===== CHAMADA FINAL ===== -->
   <section class="final-cta" aria-labelledby="h-cta">
     <div class="wrap">
       <h2 id="h-cta">O primeiro passo é uma conversa, não um contrato</h2>
@@ -547,12 +558,14 @@
   </section>
 </main>
 
+<!-- ===== RODAPÉ ===== -->
 <footer>
   <div class="wrap">
     <div class="cols">
       <a href="https://instagram.com/personal.victorcelli" target="_blank" rel="noopener">@personal.victorcelli</a>
       <a href="/">vfitcoachapp.com</a>
       <a href="tel:+5511942739425" data-cta="telefone">+55 11 94273-9425</a>
+      <a href="/privacidade">Privacidade</a>
     </div>
     <span>© 2026 VFITCOACH</span>
   </div>
@@ -563,6 +576,8 @@
     // Google Tag Manager, carregado 2s após o load pra não pesar na abertura da página.
     // Cliques antes disso ficam na fila do dataLayer e são processados quando o GTM chega.
     var dl = window.dataLayer = window.dataLayer || [];
+    // Segurança: mesmo que alguém publique no GTM, só tags nativas do Google rodam aqui.
+    dl.push({ 'gtm.blocklist': ['customScripts', 'nonGoogleScripts', 'nonGoogleIframes', 'nonGooglePixels'] });
     dl.push({ 'gtm.start': Date.now(), event: 'gtm.js' });
     window.addEventListener('load', function(){
       setTimeout(function(){
@@ -577,7 +592,7 @@
     document.addEventListener('click', function(e){
       var a = e.target.closest && e.target.closest('a[data-cta]');
       if(!a) return;
-      var ev = a.href.indexOf('tel:') === 0 ? 'phone_click' : a.href.indexOf('wa.me') > -1 ? 'whatsapp_click' : 'schedule_click';
+      var ev = a.protocol === 'tel:' ? 'phone_click' : a.hostname === 'wa.me' ? 'whatsapp_click' : 'schedule_click';
       dl.push({ event: ev, cta: a.getAttribute('data-cta') });
     });
 

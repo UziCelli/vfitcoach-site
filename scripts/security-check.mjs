@@ -28,7 +28,7 @@ for (const f of pages) {
   // CSP desatualizada = script/estilo bloqueado em produção
   for (const tag of ['script', 'style']) for (const m of html.matchAll(new RegExp(`<${tag}>([\\s\\S]*?)</${tag}>`, 'g'))) {
     const h = `sha256-${createHash('sha256').update(m[1]).digest('base64')}`;
-    if (!headers.includes(h)) bad(`${f}: <${tag}> inline mudou e a CSP não — rode "npm run build"`);
+    if (!headers.includes(h)) bad(`${f}: <${tag}> inline mudou e a CSP não — rode "npm run headers"`);
   }
 }
 for (const h of ['Content-Security-Policy', 'Strict-Transport-Security', 'X-Content-Type-Options', 'Referrer-Policy', 'frame-ancestors']) if (!headers.includes(h)) bad(`_headers sem ${h}`);
