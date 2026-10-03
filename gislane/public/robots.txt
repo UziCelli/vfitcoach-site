@@ -1,0 +1,4 @@
+User-agent: *
+Allow: /
+
+Sitemap: https://DOMINIO_A_CONFIRMAR/sitemap.xml

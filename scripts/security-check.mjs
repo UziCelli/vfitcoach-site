@@ -5,12 +5,8 @@ import { readFile, readdir } from 'node:fs/promises';
 import { createHash } from 'node:crypto';
 import { execSync } from 'node:child_process';
 import tls from 'node:tls';
-import { fileURLToPath } from 'node:url';
 import { join } from 'node:path';
-
-const SITE = 'vfitcoachapp.com';
-const root = fileURLToPath(new URL('..', import.meta.url));
-const pub = join(root, 'public');
+import { root, pubDir as pub, host as SITE } from './site.mjs';
 const problems = [];
 const info = [];
 const bad = (m) => problems.push(m);

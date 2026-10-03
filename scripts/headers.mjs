@@ -3,9 +3,10 @@
 // Uso manual: npm run headers
 import { readFile, readdir, writeFile } from 'node:fs/promises';
 import { createHash } from 'node:crypto';
-import { fileURLToPath } from 'node:url';
+import { join } from 'node:path';
+import { pubDir } from './site.mjs';
 
-const pub = (p) => fileURLToPath(new URL(`../public/${p}`, import.meta.url));
+const pub = (p) => join(pubDir, p);
 
 // CSP com o hash exato de cada <script>/<style> inline de todas as páginas .html.
 const sha = (s) => `'sha256-${createHash('sha256').update(s).digest('base64')}'`;

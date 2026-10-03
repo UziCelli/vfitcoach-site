@@ -5,14 +5,12 @@
 import http from 'node:http';
 import zlib from 'node:zlib';
 import { readFile, mkdir } from 'node:fs/promises';
-import { fileURLToPath } from 'node:url';
 import { extname, join, normalize } from 'node:path';
+import { root, pubDir as pub, host, isDefault, site } from './site.mjs';
 import lighthouse from 'lighthouse';
 import { launch } from './browser.mjs';
 
-const root = fileURLToPath(new URL('..', import.meta.url));
-const pub = join(root, 'public');
-const out = join(root, 'qa-out');
+const out = join(root, isDefault ? 'qa-out' : 'qa-out-' + site);
 await mkdir(out, { recursive: true });
 const fails = [];
 const check = (ok, msg) => { console.log(`${ok ? '  ok   ' : '  FALHA'} ${msg}`); if (!ok) fails.push(msg); };
@@ -143,13 +141,14 @@ for (const scheme of ['light', 'dark']) {
   await page.goto(base + '/', { waitUntil: 'networkidle0' });
   const bad = await page.evaluate(() => {
     const rgb = (s) => s.match(/[\d.]+/g).map(Number);
+    const hexToRgb = (h) => `rgb(${[1, 3, 5].map((i) => parseInt(h.slice(i, i + 2), 16)).join(',')})`;
     const lum = ([r, g, b]) => [r, g, b].map((v) => (v /= 255) <= 0.03928 ? v / 12.92 : ((v + 0.055) / 1.055) ** 2.4).reduce((a, v, i) => a + v * [0.2126, 0.7152, 0.0722][i], 0);
     // mistura camadas semitransparentes até achar o fundo opaco (gradiente → cor escura do navy)
     const bgOf = (el) => {
       const layers = [];
       for (let e = el; e; e = e.parentElement) {
         const cs = getComputedStyle(e);
-        if (cs.backgroundImage !== 'none' && e.classList.contains('hero')) { layers.push([11, 30, 61, 1]); break; }
+        if (cs.backgroundImage !== 'none' && e.classList.contains('hero')) { layers.push([...rgb(hexToRgb(getComputedStyle(document.documentElement).getPropertyValue('--navy').trim())), 1]); break; }
         const c = rgb(cs.backgroundColor); const a = c[3] ?? 1;
         if (a > 0) { layers.push([...c.slice(0, 3), a]); if (a === 1) break; }
       }
@@ -199,7 +198,7 @@ console.log('\n[WhatsApp]');
   await page.click('a[data-cta="agenda-hero"]');
   check((await page.evaluate(() => window.dataLayer)).some((e) => e.event === 'schedule_click'), 'clique na agenda gera evento schedule_click');
   try {
-    const r = await fetch('https://wa.me/5511942739425', { redirect: 'manual' });
+    const r = await fetch(links[0].href.split('?')[0], { redirect: 'manual' });
     check(r.status < 400, `wa.me responde (HTTP ${r.status})`);
   } catch (e) { console.log(`  aviso: sem rede pra testar wa.me (${e.message})`); }
   await page.close();
@@ -241,11 +240,18 @@ console.log('\n[SEO]');
   }));
   check(seo.title.length <= 60, `title ${seo.title.length} chars`);
   check(seo.desc.length >= 70 && seo.desc.length <= 160, `description ${seo.desc.length} chars`);
-  check(seo.canonical === 'https://vfitcoachapp.com/' && seo.og && seo.h1 === 1 && seo.lang === 'pt-BR' && !!seo.ld, 'canonical, og:image, 1 h1, lang pt-BR, JSON-LD');
+  check(seo.canonical === `https://${host.toLowerCase()}/` && seo.og && seo.h1 === 1 && seo.lang === 'pt-BR' && !!seo.ld, 'canonical, og:image, 1 h1, lang pt-BR, JSON-LD');
   for (const f of ['robots.txt', 'sitemap.xml', 'og.jpg', 'favicon.svg']) check((await fetch(`${base}/${f}`)).ok, `/${f} existe`);
   const priv = await page.$eval('footer a[href="/privacidade"]', (a) => a.href).catch(() => null);
   check(!!priv && (await fetch(priv)).ok, 'rodapé tem link para /privacidade e a página existe');
   await page.close();
+}
+
+// --- 5b. site com dados pendentes: reprova enquanto houver marcador [A CONFIRMAR ...] ---
+if (!isDefault) {
+  console.log('\n[marcadores A CONFIRMAR]');
+  const left = (await readFile(join(pub, 'index.html'), 'utf8')).match(/\[A CONFIRMAR[^\]]*\]|%5BA%20CONFIRMAR|A_CONFIRMAR/g) || [];
+  check(left.length === 0, `sem marcadores A CONFIRMAR na página (${left.length} restantes)`);
 }
 
 // --- 6. Lighthouse mobile (throttling padrão: Moto G Power, 4G lento) ---

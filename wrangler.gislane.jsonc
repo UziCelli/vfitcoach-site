@@ -1,0 +1,16 @@
+// Site da Gislane. Deploy: npm run deploy:gislane  (troque DOMINIO_A_CONFIRMAR pelo domínio real antes)
+{
+  "name": "gislane-site",
+  "compatibility_date": "2026-09-25",
+  // Só o domínio próprio: sem endereço *.workers.dev nem URLs de preview públicas.
+  "workers_dev": false,
+  "preview_urls": false,
+  "routes": [
+    { "pattern": "DOMINIO_A_CONFIRMAR", "custom_domain": true },
+    { "pattern": "www.DOMINIO_A_CONFIRMAR", "custom_domain": true }
+  ],
+  "assets": {
+    "directory": "./gislane/public",
+    "not_found_handling": "404-page"
+  }
+}
