@@ -1,4 +1,4 @@
 User-agent: *
 Allow: /
 
-Sitemap: https://DOMINIO_A_CONFIRMAR/sitemap.xml
+Sitemap: https://gislanepersonaltrainer.com/sitemap.xml

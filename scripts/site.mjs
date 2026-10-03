@@ -7,4 +7,4 @@ export const site = process.env.SITE || (arg && arg.slice(7)) || 'vfit';
 export const root = fileURLToPath(new URL('..', import.meta.url));
 export const isDefault = site === 'vfit';
 export const pubDir = join(root, isDefault ? 'public' : `${site}/public`);
-export const host = { vfit: 'vfitcoachapp.com', gislane: 'DOMINIO_A_CONFIRMAR' }[site] ?? (() => { throw new Error(`SITE desconhecido: ${site}`); })();
+export const host = { vfit: 'vfitcoachapp.com', gislane: 'gislanepersonaltrainer.com' }[site] ?? (() => { throw new Error(`SITE desconhecido: ${site}`); })();

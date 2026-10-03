@@ -61,6 +61,6 @@ Substitua `src/foto-victor.jpg` (quadrada) e rode `npm run build`. Como os asset
 
 Mesma landing, em `gislane/public/` (config: `wrangler.gislane.jsonc`, Worker `gislane-site`). O site do VFITCOACH (`public/`) não muda.
 - Comandos: `npm run headers:gislane` · `npm run qa:gislane -- --no-lh` · `npm run security:gislane` · `npm run deploy:gislane`. Os scripts leem `SITE=gislane` (ou `--site=gislane`); sem isso, valem para o VFIT. `npm run build` é só do VFIT (foto/fontes da Gislane são arquivos fixos em `gislane/public/assets`).
-- Tudo que falta está como `[A CONFIRMAR: …]` (e `DOMINIO_A_CONFIRMAR`, `A_CONFIRMAR` nos links). Enquanto houver marcador, o `qa:gislane` reprova de propósito; o `deploy:gislane` não deve ser usado antes de zerar isso.
+- Tudo que falta está como `[A CONFIRMAR: …]` (e `A_CONFIRMAR` nos links). Enquanto houver marcador, o `qa:gislane` reprova de propósito; o `deploy:gislane` não deve ser usado antes de zerar isso.
 - Sem GTM por enquanto: o ponto de troca está comentado no `<script>` final do `index.html`.
-- Domínio: troque `DOMINIO_A_CONFIRMAR` em `wrangler.gislane.jsonc`, `scripts/site.mjs` (campo `host`) e nos arquivos de `gislane/public/`.
+- Domínio: `gislanepersonaltrainer.com` (em `wrangler.gislane.jsonc`, `scripts/site.mjs` e `gislane/public/`). App em `app.gislanepersonaltrainer.com`.
