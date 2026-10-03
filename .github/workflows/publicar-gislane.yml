@@ -1,0 +1,47 @@
+name: Publicar site da Gislane
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js 22
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Gerar headers
+        run: npm run headers:gislane
+
+      - name: Checagem de segurança local
+        run: npm run security:gislane -- --local
+
+      - name: Validar marcadores de confirmação
+        run: |
+          if grep -r '\[A CONFIRMAR' gislane/public/ 2>/dev/null; then
+            echo "Erro: site contém [A CONFIRMAR"
+            exit 1
+          fi
+          if grep -r 'A_CONFIRMAR' gislane/public/ 2>/dev/null; then
+            echo "Erro: site contém A_CONFIRMAR"
+            exit 1
+          fi
+          echo "Validação passou: nenhum marcador encontrado"
+
+      - name: Deploy
+        run: npx wrangler deploy -c wrangler.gislane.jsonc
+        env:
+          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
