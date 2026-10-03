@@ -1,0 +1,16 @@
+// Site da Gislane (gislanepersonaltrainer.com). Deploy: npm run deploy:gislane
+{
+  "name": "gislane-site",
+  "compatibility_date": "2026-09-25",
+  // Só o domínio próprio: sem endereço *.workers.dev nem URLs de preview públicas.
+  "workers_dev": false,
+  "preview_urls": false,
+  "routes": [
+    { "pattern": "gislanepersonaltrainer.com", "custom_domain": true },
+    { "pattern": "www.gislanepersonaltrainer.com", "custom_domain": true }
+  ],
+  "assets": {
+    "directory": "./gislane/public",
+    "not_found_handling": "404-page"
+  }
+}

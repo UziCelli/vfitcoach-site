@@ -56,3 +56,17 @@ Sem biblioteca externa: CSS + JavaScript nativo do navegador (IntersectionObserv
 ## Trocar a foto
 
 Substitua `src/foto-victor.jpg` (quadrada) e rode `npm run build`. Como os assets têm cache de 1 ano, renomeie também os arquivos `victor-*` (ex.: `victor2-*`) no build e no index.html.
+
+## Site da Gislane (segunda marca)
+
+Mesma landing, em `gislane/public/` (config: `wrangler.gislane.jsonc`, Worker `gislane-site`). O site do VFITCOACH (`public/`) não muda.
+- Comandos: `npm run headers:gislane` · `npm run qa:gislane -- --no-lh` · `npm run security:gislane` · `npm run deploy:gislane`. Os scripts leem `SITE=gislane` (ou `--site=gislane`); sem isso, valem para o VFIT. `npm run build` é só do VFIT (foto/fontes da Gislane são arquivos fixos em `gislane/public/assets`).
+- Tudo que falta está como `[A CONFIRMAR: …]` (e `A_CONFIRMAR` nos links). Enquanto houver marcador, o `qa:gislane` reprova de propósito; o `deploy:gislane` não deve ser usado antes de zerar isso.
+- Sem GTM por enquanto: o ponto de troca está comentado no `<script>` final do `index.html`.
+- Domínio: `gislanepersonaltrainer.com` (em `wrangler.gislane.jsonc`, `scripts/site.mjs` e `gislane/public/`). App em `app.gislanepersonaltrainer.com`.
+
+### Publicar via GitHub Actions
+
+Workflow `.github/workflows/publicar-gislane.yml`: dispara com `workflow_dispatch` (manual no GitHub). Valida headers, segurança local e marcadores de confirmação, depois publica.
+Secrets do repositório (da conta Cloudflare **da Gislane**, separada da do VFITCOACH): `CLOUDFLARE_API_TOKEN_GISLANE` (token com o modelo "Editar Cloudflare Workers", incluindo a zona gislanepersonaltrainer.com) e `CLOUDFLARE_ACCOUNT_ID_GISLANE` (ID da conta dela).
+Só executa se não houver `[A CONFIRMAR` ou `A_CONFIRMAR` em `gislane/public/` — não publica site incompleto.
