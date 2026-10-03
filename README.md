@@ -68,5 +68,5 @@ Mesma landing, em `gislane/public/` (config: `wrangler.gislane.jsonc`, Worker `g
 ### Publicar via GitHub Actions
 
 Workflow `.github/workflows/publicar-gislane.yml`: dispara com `workflow_dispatch` (manual no GitHub). Valida headers, segurança local e marcadores de confirmação, depois publica.
-Secrets do repositório necessários: `CLOUDFLARE_API_TOKEN` (token da Cloudflare com permissão "Editar Cloudflare Workers" e acesso à zona do domínio) e `CLOUDFLARE_ACCOUNT_ID` (ID da conta).
+Secrets do repositório (da conta Cloudflare **da Gislane**, separada da do VFITCOACH): `CLOUDFLARE_API_TOKEN_GISLANE` (token com o modelo "Editar Cloudflare Workers", incluindo a zona gislanepersonaltrainer.com) e `CLOUDFLARE_ACCOUNT_ID_GISLANE` (ID da conta dela).
 Só executa se não houver `[A CONFIRMAR` ou `A_CONFIRMAR` em `gislane/public/` — não publica site incompleto.
