@@ -34,7 +34,7 @@ await sharp(Buffer.from(favicon)).resize(180, 180).flatten({ background: '#0B1E3
 
 // Imagem OG 1200x630 renderizada com as fontes reais
 const html = await readFile(pub('index.html'), 'utf8');
-const logo = html.match(/<svg class="logo-mark"[\s\S]*?<\/svg>/)[0].replace('class="logo-mark"', 'style="height:34px;width:auto;align-self:flex-start"');
+const logo = html.match(/<svg class="logo-mark"[\s\S]*?<\/svg>/)[0].replace('class="logo-mark"', 'style="height:34px;width:auto;align-self:flex-start"').replace(/<circle class="lm-selo"[^>]*\/>/, '');
 const f = (p) => pathToFileURL(p).href;
 const og = `<!doctype html><meta charset="utf-8"><style>
 @font-face{font-family:M;src:url(${f(pub('assets/fonts/montserrat.woff2'))});font-weight:100 900}
