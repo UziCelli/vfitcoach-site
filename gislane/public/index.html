@@ -84,7 +84,7 @@
   img{max-width:100%;height:auto;display:block;}
   svg.icon{ width:26px; height:26px; flex:0 0 auto; }
   .sprite{ position:absolute; width:0; height:0; overflow:hidden; }
-  #resultados, #como-funciona{ scroll-margin-top:56px; }
+  #resultados{ scroll-margin-top:56px; }
 
   /* ---- reveal-on-scroll (só com JS ativo) ---- */
   @media (prefers-reduced-motion: no-preference){
@@ -207,6 +207,7 @@
   }
   .results-note .dot{ flex:0 0 auto; width:6px; height:6px; border-radius:50%; background:var(--steel-light); margin-top:8px; }
   .results-note p{ font-size:13.5px; color:var(--muted); }
+  .results-foot{ margin-top:16px; font-size:13.5px; color:var(--muted); text-align:center; }
   .legend{ display:none; }
   .js .legend{ display:inline-flex; gap:16px; margin:0 0 14px; padding:7px 14px; border-radius:999px; background:var(--navy); color:#e8d7d2; font-size:12.5px; }
   .legend span{ display:inline-flex; align-items:center; gap:7px; }
@@ -352,7 +353,7 @@
         <p class="sub">Sou especialista em hipertrofia e emagrecimento feminino. Treino com execução correta e acompanhamento constante, para você ter segurança e confiança em cada exercício.</p>
         <div class="hero-actions">
           <a class="btn btn-accent" data-cta="hero" href="https://wa.me/5511915688424?text=Ol%C3%A1%2C%20Gislane!%20Vim%20pelo%20site%20e%20quero%20saber%20mais%20sobre%20os%20treinos." target="_blank" rel="noopener"><svg class="i-wa" aria-hidden="true" focusable="false"><use href="#i-wa"/></svg>Falar comigo no WhatsApp</a>
-          <a class="btn btn-ghost" href="#como-funciona">Como funciona</a>
+          <a class="btn btn-ghost" href="#resultados">Ver resultados</a>
         </div>
         <p class="alt-cta">Prefere marcar direto? <a data-cta="agenda-hero" href="https://calendar.app.google/BYtZvGHm5nssPinE7" target="_blank" rel="noopener">Escolha um horário na agenda</a></p>
       </div>
@@ -373,10 +374,117 @@
     </div>
   </section>
 
-  <!-- RESULTADOS: volta quando houver aluna com números e autorização (copie a seção RESULTADOS de public/index.html). -->
+  <!-- ===== RESULTADOS (cards de alunas) ===== -->
+  <section class="results" id="resultados" aria-labelledby="h-resultados">
+    <div class="wrap">
+      <div class="section-head reveal">
+        <span class="kicker">Resultados</span>
+        <h2 id="h-resultados">Resultados <span class="hl">medidos</span>, não prometidos</h2>
+      </div>
+
+      <div class="results-note reveal">
+        <span class="dot" aria-hidden="true"></span>
+        <p>Números reais das fichas de avaliação física (1ª avaliação → última). % de gordura por dobras cutâneas (Pollock 7 dobras). Sem fotos e só com as iniciais, por respeito às alunas.</p>
+      </div>
+
+      <p class="legend" aria-hidden="true"><span>antes</span><span>depois</span></p>
+
+      <div class="results-grid">
+
+        <!-- Uma aluna = um <article>. Pra adicionar: copie um inteiro e troque iniciais, período, dias e números
+             (exatamente como na ficha, sem arredondar). "destaque" = depois − antes de uma das linhas (o QA confere). -->
+        <article class="client-card reveal">
+          <div class="who">
+            <h3 class="name">G.</h3>
+            <span class="modality">jul/2025 → ago/2026</span>
+            <span class="meta">401 dias</span>
+          </div>
+          <p class="destaque"><strong>−17,2 kg</strong> de peso</p>
+          <dl class="stat-row">
+            <div class="stat">
+              <dt>Peso</dt>
+              <dd><span class="de">114 kg</span> <span class="arrow" role="img" aria-label="para">→</span> <strong class="para">96,8 kg</strong></dd>
+            </div>
+            <div class="stat">
+              <dt>Cintura</dt>
+              <dd><span class="de">110,5 cm</span> <span class="arrow" role="img" aria-label="para">→</span> <strong class="para">94 cm</strong></dd>
+            </div>
+            <div class="stat">
+              <dt>Massa de gordura</dt>
+              <dd><span class="de">45,44 kg</span> <span class="arrow" role="img" aria-label="para">→</span> <strong class="para">34,45 kg</strong></dd>
+            </div>
+          </dl>
+        </article>
+        <article class="client-card reveal">
+          <div class="who">
+            <h3 class="name">G.</h3>
+            <span class="modality">jun/2025 → fev/2026</span>
+            <span class="meta">243 dias</span>
+          </div>
+          <p class="destaque"><strong>−8,99 p.p.</strong> de gordura corporal</p>
+          <dl class="stat-row">
+            <div class="stat">
+              <dt>% de gordura</dt>
+              <dd><span class="de">38,66%</span> <span class="arrow" role="img" aria-label="para">→</span> <strong class="para">29,67%</strong></dd>
+            </div>
+            <div class="stat">
+              <dt>Massa de gordura</dt>
+              <dd><span class="de">28,28 kg</span> <span class="arrow" role="img" aria-label="para">→</span> <strong class="para">19,11 kg</strong></dd>
+            </div>
+            <div class="stat">
+              <dt>Abdome</dt>
+              <dd><span class="de">88,6 cm</span> <span class="arrow" role="img" aria-label="para">→</span> <strong class="para">77,1 cm</strong></dd>
+            </div>
+          </dl>
+        </article>
+        <article class="client-card reveal">
+          <div class="who">
+            <h3 class="name">B.</h3>
+            <span class="modality">jun/2025 → mai/2026</span>
+            <span class="meta">323 dias</span>
+          </div>
+          <p class="destaque"><strong>−19,5 cm</strong> de abdome</p>
+          <dl class="stat-row">
+            <div class="stat">
+              <dt>Abdome</dt>
+              <dd><span class="de">84,7 cm</span> <span class="arrow" role="img" aria-label="para">→</span> <strong class="para">65,2 cm</strong></dd>
+            </div>
+            <div class="stat">
+              <dt>Cintura</dt>
+              <dd><span class="de">72,5 cm</span> <span class="arrow" role="img" aria-label="para">→</span> <strong class="para">64,5 cm</strong></dd>
+            </div>
+          </dl>
+        </article>
+        <article class="client-card reveal">
+          <div class="who">
+            <h3 class="name">J.</h3>
+            <span class="modality">jul/2025 → set/2026</span>
+            <span class="meta">434 dias</span>
+          </div>
+          <p class="destaque"><strong>+3,75 kg</strong> de massa magra, com o mesmo peso</p>
+          <dl class="stat-row">
+            <div class="stat">
+              <dt>Peso</dt>
+              <dd><span class="de">54,3 kg</span> <span class="arrow" role="img" aria-label="para">→</span> <strong class="para">54,1 kg</strong></dd>
+            </div>
+            <div class="stat">
+              <dt>% de gordura</dt>
+              <dd><span class="de">26,21%</span> <span class="arrow" role="img" aria-label="para">→</span> <strong class="para">19,01%</strong></dd>
+            </div>
+            <div class="stat">
+              <dt>Massa magra</dt>
+              <dd><span class="de">40,07 kg</span> <span class="arrow" role="img" aria-label="para">→</span> <strong class="para">43,82 kg</strong></dd>
+            </div>
+          </dl>
+        </article>
+
+      </div>
+      <p class="results-foot">Resultados individuais. Variam conforme rotina, alimentação e frequência de treino.</p>
+    </div>
+  </section>
 
   <!-- ===== COMO FUNCIONA ===== -->
-  <section class="how" id="como-funciona" aria-labelledby="h-passos">
+  <section class="how" aria-labelledby="h-passos">
     <div class="wrap">
       <div class="section-head reveal">
         <span class="kicker">Como funciona</span>
