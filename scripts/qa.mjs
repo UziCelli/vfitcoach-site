@@ -50,7 +50,8 @@ console.log('\n[dados de clientes]');
 const html = await readFile(join(pub, 'index.html'), 'utf8');
 const num = (t) => { const m = /(\d[\d.]*(?:,\d+)?)/.exec(t); return m ? (/^\s*[−-]/.test(t) ? -1 : 1) * +m[1].replace(/\./g, '').replace(',', '.') : NaN; };
 const cards = [...html.matchAll(/<article class="client-card[\s\S]*?<\/article>/g)].map((m) => m[0]);
-check(cards.length > 0, `${cards.length} cards de cliente`);
+// o site da Gislane pode ir ao ar sem a seção de resultados (volta quando houver aluna com autorização)
+check(cards.length > 0 || !isDefault, `${cards.length} cards de cliente`);
 for (const c of cards) {
   const name = c.match(/class="name">([^<]*)</)?.[1]?.trim() || '?';
   check(/^(\p{Lu}\.\s?){1,3}$/u.test(name), `card "${name}": só iniciais (LGPD)`);
@@ -206,7 +207,8 @@ console.log('\n[WhatsApp]');
 
 // --- 4b. motion dos resultados: conta ao aparecer e termina no valor exato ---
 console.log('\n[motion]');
-{
+if (!cards.length) console.log('  (sem cards de cliente: pulado)');
+else {
   const page = await browser.newPage();
   await page.setViewport({ width: 390, height: 844, isMobile: true, hasTouch: true, deviceScaleFactor: 1 });
   await page.goto(base + '/', { waitUntil: 'load' });
