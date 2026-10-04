@@ -1,0 +1,8 @@
+Monograma VFC — feito com as letras da própria logo VFITCOACH
+
+- vfc-monograma-marinho  : selo azul-marinho com letras brancas (para fundo claro). Fundo transparente.
+- vfc-monograma-branco   : selo branco com letras azul-marinho (para fundo escuro, como o cabeçalho do site). Fundo transparente.
+- vfc-monograma-preto    : selo preto com letras brancas. Fundo transparente.
+- vfc-monograma-quadrado-marinho : quadrado 1:1 azul-marinho com o selo branco, para o logotipo quadrado do Google Ads e foto de perfil.
+
+Cada um em SVG (vetor) e PNG de 1080 x 1080 px. Azul-marinho: #0B1E3D.
