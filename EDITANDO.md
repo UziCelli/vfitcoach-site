@@ -31,7 +31,7 @@ Deu erro? Não publique. Desfaça com `git checkout public/index.html` e peça a
 
 ## Não mexa
 
-- O bloco `<svg class="wordmark">` (desenho do logo e os números da animação de rolagem).
+- O bloco `<svg class="logo-mark">` (desenho do logo).
 - Os `<script>` (um no `<head>`, um no final): contam os cliques de WhatsApp pro Google Ads e fazem as animações. Os atributos `data-cta="…"` dos botões precisam continuar lá.
 - O `<svg class="sprite">` logo depois do `<body>`: é o ícone do WhatsApp usado nos botões (`<use href="#i-wa"/>`).
 - `public/_headers`: é gerado automaticamente. Edite `scripts/headers.mjs` se precisar.
