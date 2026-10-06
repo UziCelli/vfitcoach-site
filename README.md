@@ -36,9 +36,10 @@ Primeira vez numa máquina nova: `npx wrangler login`.
 ## Google Ads — conversões
 
 Google Tag Manager `GTM-WN5LPTMX` instalado (carrega após o `load` da página). Cada clique envia para o `dataLayer`:
-- WhatsApp: `{ event: 'whatsapp_click', cta: 'topo' | 'hero' | 'passos' | 'final' }`
+- WhatsApp: `{ event: 'whatsapp_click', cta: 'topo' | 'hero' | 'passos' | 'app' | 'final' }`
 - Agenda: `{ event: 'schedule_click', cta: 'agenda-hero' | 'agenda-final' }`
 - Telefone: `{ event: 'phone_click', cta: 'telefone' }`
+- Entrar no app (aluno): `{ event: 'app_click', cta: 'app-login' }`
 
 No GTM: acionador "Evento personalizado = whatsapp_click" → tag de conversão do Google Ads (+ tag "Vinculador de conversões" em todas as páginas). Publique o contêiner.
 Domínios do Google liberados na CSP ficam em `scripts/headers.mjs` (objeto `g`). Tag nova de outro fornecedor = liberar o domínio lá, `npm run qa`, `npm run deploy`. Evite tags "HTML personalizado": a CSP bloqueia scripts inline não autorizados.

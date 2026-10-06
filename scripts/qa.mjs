@@ -101,7 +101,7 @@ for (const vp of viewports) {
 
   const overflow = await page.evaluate(() => {
     const vw = document.documentElement.clientWidth;
-    const wide = [...document.querySelectorAll('body *')].filter((el) => { const r = el.getBoundingClientRect(); return r.width && (r.right > vw + 1 || r.left < -1) && !el.closest('.hero'); })
+    const wide = [...document.querySelectorAll('body *')].filter((el) => { const r = el.getBoundingClientRect(); return r.width && (r.right > vw + 1 || r.left < -1) && !el.closest('.hero, .app-shots'); })
       .slice(0, 5).map((el) => `${el.tagName.toLowerCase()}.${el.className}`);
     return { scroll: document.documentElement.scrollWidth - vw, wide };
   });

@@ -26,6 +26,9 @@ for (const w of [400, 680, 1080]) {
   await img.clone().webp({ quality: 78 }).toFile(pub(`assets/img/victor-${w}.webp`));
 }
 
+// Prints do app (seção ===== APP =====)
+await import('./app-shots.mjs');
+
 // Favicon (V branco sobre navy) + PNGs
 const favicon = '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64"><rect width="64" height="64" rx="12" fill="#0B1E3D"/><path d="M16 17h9l7 20 7-20h9L37 47h-10z" fill="#fff"/></svg>';
 await writeFile(pub('favicon.svg'), favicon);
