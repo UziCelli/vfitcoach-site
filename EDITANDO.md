@@ -16,7 +16,7 @@ Deu erro? Não publique. Desfaça com `git checkout public/index.html` e peça a
 
 | Quero mudar… | Procure por | Atenção |
 |---|---|---|
-| Número ou mensagem do WhatsApp | `wa.me/` | Aparece **4 vezes**. Mude todas (o QA avisa se ficarem diferentes, ou diferentes do `tel:` do rodapé). A mensagem é codificada (`%20` = espaço); gere em https://www.urlencoder.org |
+| Número ou mensagem do WhatsApp | `wa.me/` | Aparece **5 vezes**. Mude todas (o QA avisa se ficarem diferentes, ou diferentes do `tel:` do rodapé). A mensagem é codificada (`%20` = espaço); gere em https://www.urlencoder.org |
 | Link da agenda | `calendar.app.google` | Aparece **2 vezes**. |
 | Telefone do rodapé | `tel:+55` | Também está no bloco `application/ld+json` no topo (`telephone`). |
 | Instagram | `personal.victorcelli` | 3 lugares: rodapé, "Sobre" e JSON-LD no topo. |
@@ -27,6 +27,7 @@ Deu erro? Não publique. Desfaça com `git checkout public/index.html` e peça a
 | Serviços / FAQ | `===== SERVIÇOS` / `===== PERGUNTAS` | Pergunta nova: copie um `<details>…</details>`. |
 | Cores | `:root{` no começo do `<style>` | `--cta` é a cor dos botões. |
 | Política de privacidade | `public/privacidade.html` | Atualize a data no topo se mudar algo. Ferramenta nova de rastreamento (ex.: Meta Pixel) = citar lá. |
+| Prints do app | `===== APP` | Print novo: PNG em `src/app/`, `npm run build` e copie um `<li>` da lista. Use só aluno de exemplo. |
 | Foto | — | Troque `src/foto-victor.jpg` e rode `npm run build` (ver README). |
 
 ## Não mexa
