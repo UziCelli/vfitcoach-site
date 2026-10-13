@@ -272,6 +272,42 @@
     .js .steps li::after{ transform:scaleX(0); }
   }
 
+  /* ---- app: carrossel de celulares em todas as telas. A tela do centro fica em destaque e as vizinhas
+     diminuem/esmaecem conforme a pessoa arrasta (CSS scroll-driven, segue o dedo); mouse e setas no script. ---- */
+  .app{ background:var(--bg); }
+  .app-shots{ --w:min(62vw, 240px); position:relative; list-style:none; margin:0; padding:10px calc(50% - var(--w) / 2) 18px;
+    display:grid; grid-auto-flow:column; grid-auto-columns:var(--w); gap:18px;
+    overflow-x:auto; scroll-snap-type:x mandatory; scrollbar-width:none; overscroll-behavior-x:contain; cursor:grab;
+    -webkit-mask-image:linear-gradient(90deg, transparent, #000 10%, #000 90%, transparent);
+            mask-image:linear-gradient(90deg, transparent, #000 10%, #000 90%, transparent); }
+  .app-shots::-webkit-scrollbar{ display:none; }
+  .app-shots.glide{ scroll-snap-type:none; cursor:grabbing; }
+  .app-shots li{ scroll-snap-align:center; }
+  .app-shots figure{ margin:0; }
+  .app-shots img{ pointer-events:none; -webkit-user-drag:none; user-select:none; }
+  .phone{ border-radius:30px; padding:7px; background:var(--navy); box-shadow:0 0 0 1px var(--border), 0 16px 32px rgba(14,10,9,.18); }
+  .phone img{ width:100%; aspect-ratio:1170/2532; object-fit:contain; border-radius:24px; background:var(--navy); }
+  .app-shots figcaption{ margin-top:12px; font-size:13.5px; line-height:1.45; color:var(--muted); text-align:center; }
+  .app-sub{ margin:30px 0 14px; font-size:17px; color:var(--ink); }
+  .app-nav{ display:none; justify-content:center; gap:12px; margin-top:4px; }
+  .js .app-nav{ display:flex; }
+  .app-nav button{ width:44px; height:44px; border-radius:50%; border:1px solid var(--border); background:var(--card); color:var(--ink);
+    font-size:22px; line-height:1; cursor:pointer; transition:background-color .15s ease; }
+  .app-nav button:hover{ background:var(--border); }
+  /* 50% = tela no centro; a vizinha fica perto de 30%/70% no computador e além disso no celular */
+  @keyframes shot-pass{
+    0%, 28%{ transform:scale(.86) translateY(12px); opacity:.45; animation-timing-function:cubic-bezier(.25,.6,.3,1); }
+    50%{ transform:none; opacity:1; animation-timing-function:cubic-bezier(.7,0,.75,.4); }
+    72%, 100%{ transform:scale(.86) translateY(12px); opacity:.45; }
+  }
+  @supports (animation-timeline: view()){
+    @media (prefers-reduced-motion: no-preference){
+      .app-shots li{ animation:shot-pass linear both; animation-timeline:view(inline); }
+    }
+  }
+  .app-note{ margin-top:18px; font-size:12.5px; color:var(--muted); }
+  .app-login{ margin-top:12px; font-size:14px; color:var(--muted); }
+  .app-login a{ color:var(--accent-text); font-weight:600; text-underline-offset:3px; display:inline-block; padding-block:6px; }
   /* ---- services ---- */
   .services-grid{ display:grid; grid-template-columns:repeat(2,1fr); gap:20px; }
   @media (max-width:900px){ .services-grid{ grid-template-columns:1fr; } }
@@ -510,6 +546,38 @@
     </div>
   </section>
 
+  <!-- ===== APP ===== -->
+  <!-- Prints: telas reais do app com aluno de exemplo. Print novo = PNG em gislane/src/app/ + "npm run shots:gislane" + um <li> aqui. -->
+  <section class="app" aria-labelledby="h-app">
+    <div class="wrap">
+      <div class="section-head reveal">
+        <span class="kicker">App da Gislane</span>
+        <h2 id="h-app">Seu treino no bolso, <span class="hl">comigo do lado</span></h2>
+        <p>Treino do dia, cargas, descanso e evolução num app só. Funciona no Android e no iPhone, sem loja de apps.</p>
+      </div>
+      <ul class="app-shots reveal" tabindex="0" aria-label="Telas do app do aluno (arraste para o lado)">
+        <li><figure><div class="phone"><picture><source type="image/avif" srcset="/assets/img/app/01-aluno-hoje-300.avif 300w, /assets/img/app/01-aluno-hoje-600.avif 600w" sizes="240px"><source type="image/webp" srcset="/assets/img/app/01-aluno-hoje-300.webp 300w, /assets/img/app/01-aluno-hoje-600.webp 600w" sizes="240px"><img src="/assets/img/app/01-aluno-hoje-300.webp" alt="O treino do dia pronto no celular" width="924" height="1770" loading="lazy" decoding="async"></picture></div><figcaption>O treino do dia pronto no celular</figcaption></figure></li>
+        <li><figure><div class="phone"><picture><source type="image/avif" srcset="/assets/img/app/02-aluno-treino-300.avif 300w, /assets/img/app/02-aluno-treino-600.avif 600w" sizes="240px"><source type="image/webp" srcset="/assets/img/app/02-aluno-treino-300.webp 300w, /assets/img/app/02-aluno-treino-600.webp 600w" sizes="240px"><img src="/assets/img/app/02-aluno-treino-300.webp" alt="Anote as cargas em segundos, com a da semana passada do lado" width="924" height="2000" loading="lazy" decoding="async"></picture></div><figcaption>Anote as cargas em segundos, com a da semana passada do lado</figcaption></figure></li>
+        <li><figure><div class="phone"><picture><source type="image/avif" srcset="/assets/img/app/03-aluno-evolucao-300.avif 300w, /assets/img/app/03-aluno-evolucao-600.avif 600w" sizes="240px"><source type="image/webp" srcset="/assets/img/app/03-aluno-evolucao-300.webp 300w, /assets/img/app/03-aluno-evolucao-600.webp 600w" sizes="240px"><img src="/assets/img/app/03-aluno-evolucao-300.webp" alt="Acompanhe sua evolução: frequência, cardio e recordes" width="924" height="2000" loading="lazy" decoding="async"></picture></div><figcaption>Acompanhe sua evolução: frequência, cardio e recordes</figcaption></figure></li>
+        <li><figure><div class="phone"><picture><source type="image/avif" srcset="/assets/img/app/04-aluno-relatorio-300.avif 300w, /assets/img/app/04-aluno-relatorio-600.avif 600w" sizes="240px"><source type="image/webp" srcset="/assets/img/app/04-aluno-relatorio-300.webp 300w, /assets/img/app/04-aluno-relatorio-600.webp 600w" sizes="240px"><img src="/assets/img/app/04-aluno-relatorio-300.webp" alt="Relatório de cada ciclo, com um recado meu" width="924" height="2000" loading="lazy" decoding="async"></picture></div><figcaption>Relatório de cada ciclo, com um recado meu</figcaption></figure></li>
+        <li><figure><div class="phone"><picture><source type="image/avif" srcset="/assets/img/app/05-aluno-metodos-300.avif 300w, /assets/img/app/05-aluno-metodos-600.avif 600w" sizes="240px"><source type="image/webp" srcset="/assets/img/app/05-aluno-metodos-300.webp 300w, /assets/img/app/05-aluno-metodos-600.webp 600w" sizes="240px"><img src="/assets/img/app/05-aluno-metodos-300.webp" alt="Dropset, biset… o app explica cada método" width="924" height="2000" loading="lazy" decoding="async"></picture></div><figcaption>Dropset, biset… o app explica cada método</figcaption></figure></li>
+      </ul>
+      <div class="app-nav"><button type="button" data-dir="-1" aria-label="Tela anterior">‹</button><button type="button" data-dir="1" aria-label="Próxima tela">›</button></div>
+      <h3 class="app-sub">Do meu lado, como coach</h3>
+      <ul class="app-shots app-shots--coach reveal" tabindex="0" aria-label="Telas do app do coach (arraste para o lado)">
+        <li><figure><div class="phone"><picture><source type="image/avif" srcset="/assets/img/app/11-coach-semana-300.avif 300w, /assets/img/app/11-coach-semana-600.avif 600w" sizes="240px"><source type="image/webp" srcset="/assets/img/app/11-coach-semana-300.webp 300w, /assets/img/app/11-coach-semana-600.webp 600w" sizes="240px"><img src="/assets/img/app/11-coach-semana-300.webp" alt="Acompanho cada série sua de perto" width="924" height="2000" loading="lazy" decoding="async"></picture></div><figcaption>Acompanho cada série sua de perto</figcaption></figure></li>
+        <li><figure><div class="phone"><picture><source type="image/avif" srcset="/assets/img/app/12-coach-prescricao-300.avif 300w, /assets/img/app/12-coach-prescricao-600.avif 600w" sizes="240px"><source type="image/webp" srcset="/assets/img/app/12-coach-prescricao-300.webp 300w, /assets/img/app/12-coach-prescricao-600.webp 600w" sizes="240px"><img src="/assets/img/app/12-coach-prescricao-300.webp" alt="Treino montado sob medida, semana a semana" width="924" height="2000" loading="lazy" decoding="async"></picture></div><figcaption>Treino montado sob medida, semana a semana</figcaption></figure></li>
+        <li><figure><div class="phone"><picture><source type="image/avif" srcset="/assets/img/app/13-coach-presencial-300.avif 300w, /assets/img/app/13-coach-presencial-600.avif 600w" sizes="240px"><source type="image/webp" srcset="/assets/img/app/13-coach-presencial-300.webp 300w, /assets/img/app/13-coach-presencial-600.webp 600w" sizes="240px"><img src="/assets/img/app/13-coach-presencial-300.webp" alt="No presencial, tudo registrado na hora" width="924" height="2000" loading="lazy" decoding="async"></picture></div><figcaption>No presencial, tudo registrado na hora</figcaption></figure></li>
+      </ul>
+      <div class="app-nav"><button type="button" data-dir="-1" aria-label="Tela anterior">‹</button><button type="button" data-dir="1" aria-label="Próxima tela">›</button></div>
+      <p class="app-note">Telas reais do app, com dados de exemplo.</p>
+      <div class="how-cta reveal">
+        <a class="btn btn-accent" data-cta="app" href="https://wa.me/5511915688424?text=Ol%C3%A1%2C%20Gislane!%20Vim%20pelo%20site%20e%20quero%20saber%20mais%20sobre%20os%20treinos." target="_blank" rel="noopener"><svg class="i-wa" aria-hidden="true" focusable="false"><use href="#i-wa"/></svg>Quero treinar com o app</a>
+        <p class="app-login">Já treina comigo? <a data-cta="app-login" href="https://app.gislanepersonaltrainer.com" target="_blank" rel="noopener">Entrar no app</a></p>
+      </div>
+    </div>
+  </section>
+
   <!-- ===== SERVIÇOS ===== -->
   <section aria-labelledby="h-servicos">
     <div class="wrap">
@@ -661,7 +729,7 @@
     document.addEventListener('click', function(e){
       var a = e.target.closest && e.target.closest('a[data-cta]');
       if(!a) return;
-      var ev = a.protocol === 'tel:' ? 'phone_click' : a.hostname === 'wa.me' ? 'whatsapp_click' : 'schedule_click';
+      var ev = a.protocol === 'tel:' ? 'phone_click' : a.hostname === 'wa.me' ? 'whatsapp_click' : a.hostname === 'app.gislanepersonaltrainer.com' ? 'app_click' : 'schedule_click';
       dl.push({ event: ev, cta: a.getAttribute('data-cta') });
     });
 
@@ -693,6 +761,47 @@
         });
       }, delay);
     }
+
+    // Carrossel do app: arrastar com o mouse (no toque o próprio navegador desliza) e setas ‹ ›.
+    // Ao soltar, desliza com inércia e para na tela mais próxima com freio suave (ease-out).
+    document.querySelectorAll('.app-shots').forEach(function(track){
+      var anim = 0, down = false, x0 = 0, s0 = 0, lastX = 0, lastT = 0, v = 0;
+      var centers = function(){ return [].map.call(track.children, function(li){ return li.offsetLeft + li.offsetWidth / 2 - track.clientWidth / 2; }); };
+      var nearest = function(x){ return centers().reduce(function(a, c){ return Math.abs(c - x) < Math.abs(a - x) ? c : a; }); };
+      var glide = function(to){
+        window.cancelAnimationFrame(anim);
+        var from = track.scrollLeft, t0 = performance.now(), ms = calm ? 1 : 560;
+        track.classList.add('glide');
+        anim = window.requestAnimationFrame(function step(now){
+          var k = Math.min(1, (now - t0) / ms);
+          track.scrollLeft = from + (to - from) * (1 - Math.pow(1 - k, 4));
+          if(k < 1) anim = window.requestAnimationFrame(step); else track.classList.remove('glide');
+        });
+      };
+      track.addEventListener('pointerdown', function(e){
+        if(e.pointerType !== 'mouse' || e.button !== 0) return;
+        window.cancelAnimationFrame(anim);
+        down = true; x0 = lastX = e.clientX; s0 = track.scrollLeft; lastT = e.timeStamp; v = 0;
+        track.setPointerCapture(e.pointerId);
+        track.classList.add('glide');
+      });
+      track.addEventListener('pointermove', function(e){
+        if(!down) return;
+        track.scrollLeft = s0 - (e.clientX - x0);
+        if(e.timeStamp > lastT){ v = (e.clientX - lastX) / (e.timeStamp - lastT); lastX = e.clientX; lastT = e.timeStamp; }
+      });
+      var release = function(){ if(!down) return; down = false; glide(nearest(track.scrollLeft - v * 280)); };
+      track.addEventListener('pointerup', release);
+      track.addEventListener('pointercancel', release);
+      var nav = track.nextElementSibling;
+      if(nav && nav.classList.contains('app-nav')) nav.addEventListener('click', function(e){
+        var b = e.target.closest('button');
+        if(!b) return;
+        var cur = track.scrollLeft, list = centers(), dir = +b.getAttribute('data-dir');
+        var next = dir > 0 ? list.filter(function(c){ return c > cur + 4; })[0] : list.filter(function(c){ return c < cur - 4; }).pop();
+        if(next !== undefined) glide(next);
+      });
+    });
 
     // Número do destaque grande + unidade menor ("−10,4" "kg")
     document.querySelectorAll('.destaque strong').forEach(function(el){
