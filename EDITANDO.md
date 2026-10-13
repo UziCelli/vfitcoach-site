@@ -53,4 +53,5 @@ Deu erro? Não publique. Desfaça com `git checkout public/index.html` e peça a
 Arquivos em `gislane/public/` (mesma estrutura e mesmas regras acima). Receita: edite `gislane/public/index.html` → `npm run qa:gislane -- --no-lh` → `npm run deploy:gislane`.
 - Procure por `A CONFIRMAR` e `A_CONFIRMAR`: cada marcador é um dado que falta (WhatsApp, telefone, Instagram, agenda, e-mail, cidade/locais, bio, fotos, resultados, título/descrição do Google). O WhatsApp aparece 4x e a agenda 2x, como no VFIT.
 - Card de resultado: o de exemplo está só com marcadores (veja o comentário no HTML). Preencha com iniciais e números reais, com autorização da aluna.
+- Prints do app: PNG em `gislane/src/app/` → `npm run shots:gislane` → um `<li>` na seção `===== APP =====`.
 - O QA da Gislane reprova enquanto sobrar marcador; é o aviso de "ainda não publique".

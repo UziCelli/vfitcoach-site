@@ -1,11 +1,12 @@
-// Prints do app (src/app/*.png) -> AVIF + WebP leves em public/assets/img/app/. Rodado pelo "npm run build".
+// Prints do app (src/app/*.png; gislane/src/app/ com --site=gislane) -> AVIF + WebP leves em <pubDir>/assets/img/app/. Rodado pelo "npm run build".
 // Print novo: coloque o PNG em src/app/, rode "npm run build" e adicione na seção ===== APP ===== do index.html.
 import { readdir, mkdir } from 'node:fs/promises';
-import { fileURLToPath } from 'node:url';
+import { join } from 'node:path';
+import { root, pubDir, isDefault } from './site.mjs';
 import sharp from 'sharp';
 
-const src = fileURLToPath(new URL('../src/app/', import.meta.url));
-const out = fileURLToPath(new URL('../public/assets/img/app/', import.meta.url));
+const src = join(root, isDefault ? 'src/app' : 'gislane/src/app') + '/';
+const out = join(pubDir, 'assets/img/app') + '/';
 await mkdir(out, { recursive: true });
 for (const file of (await readdir(src)).filter((f) => f.endsWith('.png'))) {
   const name = file.replace(/\.png$/, '');

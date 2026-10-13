@@ -8,6 +8,7 @@
     "qa": "node scripts/qa.mjs",
     "security": "node scripts/security-check.mjs",
     "deploy": "npm run headers && npm run security -- --local && wrangler deploy",
+    "shots:gislane": "node scripts/app-shots.mjs --site=gislane",
     "headers:gislane": "node scripts/headers.mjs --site=gislane",
     "qa:gislane": "node scripts/qa.mjs --site=gislane",
     "security:gislane": "node scripts/security-check.mjs --site=gislane",
