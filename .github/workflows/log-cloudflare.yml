@@ -1,0 +1,71 @@
+name: Log do build do Cloudflare
+
+# Quando o build do Cloudflare falha num commit, busca o log dele pela API da Cloudflare
+# e deixa no log deste job (e como arquivo), para ler sem abrir o painel da Cloudflare.
+# Precisa do segredo CLOUDFLARE_BUILDS_TOKEN (token de usuário com permissão "Workers CI Read").
+# Sem o segredo, o job só avisa e termina sem erro.
+
+on:
+  check_run:
+    types: [completed]
+  workflow_dispatch:
+    inputs:
+      url:
+        description: "Link do build no painel da Cloudflare (o 'details_url' da checagem)"
+        required: true
+
+permissions:
+  contents: read
+
+jobs:
+  log:
+    if: github.event_name == 'workflow_dispatch' || (startsWith(github.event.check_run.name, 'Workers Builds') && github.event.check_run.conclusion == 'failure')
+    runs-on: ubuntu-latest
+    steps:
+      - name: Buscar o log do build
+        env:
+          CF_TOKEN: ${{ secrets.CLOUDFLARE_BUILDS_TOKEN }}
+          URL: ${{ github.event.check_run.details_url || inputs.url }}
+        run: |
+          set -uo pipefail
+          if [ -z "${CF_TOKEN:-}" ]; then
+            echo "::warning::Falta o segredo CLOUDFLARE_BUILDS_TOKEN neste repositório; não dá para buscar o log."
+            exit 0
+          fi
+          ACCOUNT=$(printf '%s' "$URL" | sed -nE 's#.*dash\.cloudflare\.com/([0-9a-f]{32})/.*#\1#p')
+          BUILD=$(printf '%s' "$URL" | sed -nE 's#.*/builds/([0-9a-f-]{36}).*#\1#p')
+          if [ -z "$ACCOUNT" ] || [ -z "$BUILD" ]; then
+            echo "::error::Não achei a conta e o build neste link: $URL"
+            exit 1
+          fi
+          echo "Build $BUILD (conta $ACCOUNT)"
+          : > log.json
+          : > log.txt
+          cursor=""
+          for _ in $(seq 1 20); do
+            resp=$(curl -sS -H "Authorization: Bearer $CF_TOKEN" \
+              "https://api.cloudflare.com/client/v4/accounts/$ACCOUNT/builds/builds/$BUILD/logs${cursor:+?cursor=$cursor}")
+            printf '%s\n' "$resp" >> log.json
+            if [ "$(printf '%s' "$resp" | jq -r '.success // false' 2>/dev/null)" != "true" ]; then
+              echo "::error::A API da Cloudflare respondeu com erro:"
+              printf '%s' "$resp" | jq -c '.errors // .' 2>/dev/null || printf '%s\n' "$resp"
+              break
+            fi
+            printf '%s' "$resp" | jq -r '.result.lines[]? | if type=="array" then (.[1:] | map(tostring) | join(" ")) else tostring end' >> log.txt
+            cursor=$(printf '%s' "$resp" | jq -r '.result.cursor // empty')
+            truncated=$(printf '%s' "$resp" | jq -r '.result.truncated // false')
+            [ -n "$cursor" ] && [ "$truncated" = "true" ] || break
+          done
+          echo "===== ÚLTIMAS LINHAS DO LOG DO CLOUDFLARE ====="
+          if [ -s log.txt ]; then tail -n 200 log.txt; else echo "(sem linhas no formato esperado; resposta bruta abaixo)"; tail -c 6000 log.json; fi
+
+      - name: Guardar o log completo
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: log-cloudflare
+          path: |
+            log.json
+            log.txt
+          if-no-files-found: ignore
+          retention-days: 14
