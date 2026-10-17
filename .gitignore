@@ -16,3 +16,6 @@ Thumbs.db
 desktop.ini
 *.log
 .claude/settings.local.json
+
+# mapa do código do Graphify (gerado a cada sessão)
+graphify-out/
