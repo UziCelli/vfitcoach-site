@@ -5,6 +5,8 @@
   // Só o domínio próprio: sem endereço *.workers.dev nem URLs de preview públicas.
   "workers_dev": false,
   "preview_urls": false,
+  // Exigido pelo build de branches do Cloudflare (`npx wrangler preview`); sem isso o build falha.
+  "previews": {},
   "routes": [
     { "pattern": "vfitcoachapp.com", "custom_domain": true },
     { "pattern": "www.vfitcoachapp.com", "custom_domain": true }
