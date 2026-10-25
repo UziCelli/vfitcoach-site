@@ -23,6 +23,7 @@
     "wrangler": "^4.147.0"
   },
   "overrides": {
-    "sharp": "$sharp"
+    "sharp": "$sharp",
+    "undici": "^7.30.1"
   }
 }
