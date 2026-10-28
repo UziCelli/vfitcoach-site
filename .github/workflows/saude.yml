@@ -1,0 +1,85 @@
+name: Saúde do site
+
+# Log de tráfego: a cada hora abre os dois sites e confere se respondem com a página certa; uma vez por dia roda a checagem de segurança ao vivo (headers, HTTPS, certificado, dependências).
+# Cada execução (Actions > Saúde do site) mostra o código e o tempo de resposta de cada endereço.
+# Fora do ar = uma Issue com @UziCelli (e-mail e push do GitHub), sem repetir; quando volta, a Issue fecha sozinha.
+on:
+  schedule:
+    - cron: '47 * * * *'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  issues: write
+
+jobs:
+  saude:
+    runs-on: ubuntu-latest
+    env:
+      # endereço|código esperado|texto que precisa aparecer na resposta (cabeçalho ou página)
+      ENDERECOS: |
+        https://vfitcoachapp.com|200|data-cta="hero"
+        https://www.vfitcoachapp.com|200|data-cta="hero"
+        https://gislanepersonaltrainer.com|200|data-cta="hero"
+    steps:
+      - name: Conferir endereços
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          echo "## Saúde ($(date -u '+%F %H:%M') UTC)" >> "$GITHUB_STEP_SUMMARY"
+          echo "| Endereço | Código | Tempo (s) | Situação |" >> "$GITHUB_STEP_SUMMARY"
+          echo "|---|---|---|---|" >> "$GITHUB_STEP_SUMMARY"
+          fora=0
+          while IFS='|' read -r url esperado texto; do
+            [ -n "$url" ] || continue
+            ok=0
+            # 3 tentativas com 30s entre elas: uma oscilação de rede não vira alarme.
+            for t in 1 2 3; do
+              read -r codigo tempo <<< "$(curl -sS -m 30 -D cab.txt -o pag.html -w '%{http_code} %{time_total}' "$url" 2>/dev/null || true)"
+              if [ "$codigo" = "$esperado" ] && cat cab.txt pag.html 2>/dev/null | grep -qF "$texto"; then ok=1; break; fi
+              [ "$t" = 3 ] || sleep 30
+            done
+            situacao=$([ "$ok" = 1 ] && echo "✅ no ar" || echo "❌ fora do ar")
+            echo "| $url | ${codigo:-000} | ${tempo:-0} | $situacao |" >> "$GITHUB_STEP_SUMMARY"
+            echo "$url → ${codigo:-000} em ${tempo:-0}s: $situacao"
+            titulo="⚠️ Fora do ar: $url"
+            existe=$(gh api --paginate "repos/${{ github.repository }}/issues?state=open&per_page=100" --jq ".[] | select(.pull_request | not) | select(.title == \"$titulo\") | .number" | head -1)
+            if [ "$ok" = 0 ]; then
+              fora=1
+              [ -n "$existe" ] || gh api "repos/${{ github.repository }}/issues" -f title="$titulo" \
+                -f body="$url não respondeu como esperado (código ${codigo:-000}; esperado $esperado com o conteúdo certo) em 3 tentativas. Log: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}. Se continuar, chame o Claude."$'\n\n@UziCelli' > /dev/null
+            elif [ -n "$existe" ]; then
+              gh api "repos/${{ github.repository }}/issues/$existe/comments" -f body="Voltou ao ar ($(date -u '+%F %H:%M') UTC, código $codigo em ${tempo}s)." > /dev/null
+              gh api -X PATCH "repos/${{ github.repository }}/issues/$existe" -f state=closed -f state_reason=completed > /dev/null
+            fi
+          done <<< "$ENDERECOS"
+          exit $fora
+
+  # Uma vez por dia (execução das 9h UTC) ou manual: a mesma checagem do deploy, agora contra os sites no ar.
+  seguranca:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - name: Checagem de segurança
+        env:
+          GH_TOKEN: ${{ github.token }}
+          EVENTO: ${{ github.event_name }}
+        run: |
+          [ "$EVENTO" = workflow_dispatch ] || [ "$(date -u +%H)" = 09 ] || { echo "Só roda às 9h UTC."; exit 0; }
+          for site in vfit gislane; do
+            if node scripts/security-check.mjs --site=$site > saida.txt 2>&1; then
+              echo "✅ $site: segurança ok"
+            else
+              cat saida.txt
+              titulo="🚨 Segurança do site ($site)"
+              existe=$(gh api --paginate "repos/${{ github.repository }}/issues?state=open&per_page=100" --jq ".[] | select(.pull_request | not) | select(.title == \"$titulo\") | .number" | head -1)
+              [ -n "$existe" ] || gh api "repos/${{ github.repository }}/issues" -f title="$titulo" \
+                -f body="A checagem diária encontrou problema: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}. Chame o Claude para ver."$'\n\n@UziCelli' > /dev/null
+              falhou=1
+            fi
+            { echo "### Segurança ($site)"; echo '```'; cat saida.txt; echo '```'; } >> "$GITHUB_STEP_SUMMARY"
+          done
+          exit ${falhou:-0}
