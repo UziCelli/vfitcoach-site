@@ -7,9 +7,12 @@ import { execSync } from 'node:child_process';
 import tls from 'node:tls';
 import { join } from 'node:path';
 import { root, pubDir as pub, host as SITE } from './site.mjs';
+import { unsafeArtifacts } from './public-artifacts.mjs';
 const problems = [];
 const info = [];
 const bad = (m) => problems.push(m);
+
+for (const path of await unsafeArtifacts(pub)) bad(`Artefato interno na pasta pública: ${path}`);
 
 // --- 1. HTML: sem formulários, scripts externos, handlers inline ou links inseguros ---
 const pages = (await readdir(pub)).filter((f) => f.endsWith('.html'));
