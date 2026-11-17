@@ -3,6 +3,11 @@ on:
   pull_request:
   push:
     branches: [master]
+concurrency:
+  group: repository-workflows
+  cancel-in-progress: false
+  queue: max
+
 permissions:
   contents: read
 jobs:
