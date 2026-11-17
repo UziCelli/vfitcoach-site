@@ -19,9 +19,9 @@
     "@fontsource-variable/inter": "^5.3.0",
     "@fontsource-variable/montserrat": "^5.3.0",
     "lighthouse": "^13.5.0",
-    "puppeteer": "^25.12.0",
+    "puppeteer": "^25.17.0",
     "sharp": "^0.35.5",
-    "wrangler": "^4.147.0"
+    "wrangler": "^4.162.0"
   },
   "overrides": {
     "sharp": "$sharp",
