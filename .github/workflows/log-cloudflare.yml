@@ -14,6 +14,11 @@ on:
         description: "Link do build no painel da Cloudflare (o 'details_url' da checagem)"
         required: true
 
+concurrency:
+  group: repository-workflows
+  cancel-in-progress: false
+  queue: max
+
 permissions:
   contents: read
 
